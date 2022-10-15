@@ -1,5 +1,5 @@
 """
-Models for YourResourceModel
+Models for shopcart
 
 All of the models are stored in this module
 """
@@ -15,72 +15,40 @@ db = SQLAlchemy()
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
 
-    pass
+######################################################################
+#  P E R S I S T E N T   B A S E   M O D E L
+######################################################################
+class PersistentBase:
+    """Base class added persistent methods"""
 
-
-class YourResourceModel(db.Model):
-    """
-    Class that represents a YourResourceModel
-    """
-
-    app = None
-
-    # Table Schema
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(63))
-
-    def __repr__(self):
-        return "<YourResourceModel %r id=[%s]>" % (self.name, self.id)
+    def __init__(self):
+        self.id = None  # pylint: disable=invalid-name
 
     def create(self):
         """
-        Creates a YourResourceModel to the database
+        Creates a item/shopcart to the database
         """
-        logger.info("Creating %s", self.name)
+        logger.info("Creating shopcart")
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
 
     def update(self):
         """
-        Updates a YourResourceModel to the database
+        Updates a item/shopcart to the database
         """
-        logger.info("Saving %s", self.name)
+        logger.info("Updating shopcart")
         db.session.commit()
 
     def delete(self):
-        """ Removes a YourResourceModel from the data store """
-        logger.info("Deleting %s", self.name)
+        """Removes a Shopcart from the data store"""
+        logger.info("Deleting shopcart")
         db.session.delete(self)
         db.session.commit()
 
-    def serialize(self):
-        """ Serializes a YourResourceModel into a dictionary """
-        return {"id": self.id, "name": self.name}
-
-    def deserialize(self, data):
-        """
-        Deserializes a YourResourceModel from a dictionary
-
-        Args:
-            data (dict): A dictionary containing the resource data
-        """
-        try:
-            self.name = data["name"]
-        except KeyError as error:
-            raise DataValidationError(
-                "Invalid YourResourceModel: missing " + error.args[0]
-            )
-        except TypeError as error:
-            raise DataValidationError(
-                "Invalid YourResourceModel: body of request contained bad or no data - "
-                "Error message: " + error
-            )
-        return self
-
     @classmethod
     def init_db(cls, app):
-        """ Initializes the database session """
+        """Initializes the database session"""
         logger.info("Initializing database")
         cls.app = app
         # This is where we initialize SQLAlchemy from the Flask app
@@ -90,15 +58,63 @@ class YourResourceModel(db.Model):
 
     @classmethod
     def all(cls):
-        """ Returns all of the YourResourceModels in the database """
-        logger.info("Processing all YourResourceModels")
+        """Returns all of the records in the database"""
+        logger.info("Processing all records")
         return cls.query.all()
 
     @classmethod
     def find(cls, by_id):
-        """ Finds a YourResourceModel by it's ID """
+        """Finds a record by it's ID"""
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
+
+
+######################################################################
+#  I T E M   M O D E L
+######################################################################
+class Item(db.Model, PersistentBase):
+
+    app = None
+
+    # Table Schema
+    id = db.Column(db.Integer, primary_key=True)
+    shopcart_id = db.Column(db.Integer, db.ForeignKey("shopcart.id"), nullable=False)
+    name = db.Column(db.String(64), nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    color = db.Column(db.String(16))
+
+
+    def __repr__(self):
+        return f"<Item {self.name} id=[{self.id}] shopcart[{self.shopcart_id}]>"
+
+    def serialize(self):
+        """ Serializes a Item into a dictionary """
+        return {"id": self.id, "shopcart_id": self.shopcart_id, "name": self.name, "price": self.price, "quantity": self.quantity, "color": self.color}
+
+    def deserialize(self, data):
+        """
+        Deserializes a Item from a dictionary
+
+        Args:
+            data (dict): A dictionary containing the resource data
+        """
+        try:
+            self.shopcart_id = data["shopcart_id"]
+            self.name = data["name"]
+            self.price = data["price"]
+            self.quantity = data["quantity"]
+            self.color = data["color"]
+        except KeyError as error:
+            raise DataValidationError(
+                "Invalid Item: missing " + error.args[0]
+            )
+        except TypeError as error:
+            raise DataValidationError(
+                "Invalid Item: body of request contained bad or no data - "
+                "Error message: " + error.args[0]
+            )
+        return self
 
     @classmethod
     def find_by_name(cls, name):
@@ -109,3 +125,52 @@ class YourResourceModel(db.Model):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+
+######################################################################
+#  S H O P C A R T   M O D E L
+######################################################################
+class Shopcart(db.Model, PersistentBase):
+
+    app = None
+
+    # Table Schema
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, nullable=False)
+    items = db.relationship("Item", backref="shopcart", passive_deletes=True)
+
+
+    def __repr__(self):
+        return f"<Shopcart {self.id} customer {self.customer_id}>"
+
+    def serialize(self):
+        """ Serializes a Shopcart into a dictionary """
+        shopcart =  {"id": self.id, "customer_id": self.customer_id, "items": []}
+        for item in self.items:
+            shopcart["items"].append(item.serialize())
+        return shopcart
+
+    def deserialize(self, data):
+        """
+        Deserializes a Shopcart from a dictionary
+
+        Args:
+            data (dict): A dictionary containing the resource data
+        """
+        try:
+            self.customer_id = data["customer_id"]
+            items_list = data.get("items")
+            for json_item in items_list:
+                item = Item()
+                item.deserialize(json_item)
+                self.items.append(item)
+        except KeyError as error:
+            raise DataValidationError(
+                "Invalid Shopcart: missing " + error.args[0]
+            )
+        except TypeError as error:
+            raise DataValidationError(
+                "Invalid Shopcart: body of request contained bad or no data - "
+                "Error message: " + error.args[0]
+            )
+        return self
+
