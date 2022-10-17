@@ -132,5 +132,5 @@ class TestShopcartServer(TestCase):
             f"{BASE_URL}"
         )
         resp_dict = resp.get_json()
-        
+
         self.assertEqual(resp_dict["shopcarts"], shopcarts)

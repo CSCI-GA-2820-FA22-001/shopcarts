@@ -100,7 +100,7 @@ def delete_shopcart(shopcart_id):
 def list_all_shopcarts():
     """
     List all shopcarts.
-    Returns a JSON that contains all shopcarts.
+    Returns a JSON that contains all shopcarts under the key 'shopcarts'.
     """
     shopcart = Shopcart()
     shopcarts = {"shopcarts": []}
