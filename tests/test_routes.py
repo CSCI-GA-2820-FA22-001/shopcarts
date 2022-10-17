@@ -136,8 +136,7 @@ class TestShopcartServer(TestCase):
         data = resp.get_json()
         for (expect_item, retriveved_item) in zip(shopcart.items, data["items"]):
             self.assertEqual(expect_item.serialize(), retriveved_item)
-        resp = self.client.get(f"{BASE_URL}/123456", content_type="application/json")
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        
 
 
         
