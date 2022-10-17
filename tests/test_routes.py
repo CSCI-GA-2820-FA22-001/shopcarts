@@ -68,6 +68,13 @@ class TestShopcartServer(TestCase):
             shopcarts.append(shopcart)
         return shopcarts
 
+    def _create_items(self, count):
+        """ Factory method to create items in bulk """
+        items = []
+        for _ in range(count):
+            item = ItemFactory()
+            items.append(item)
+        return items
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
@@ -112,3 +119,25 @@ class TestShopcartServer(TestCase):
         self.assertEqual(data["id"], shopcart.id)
         resp = self.client.get(f"{BASE_URL}/123456", content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_list_item(self):
+        """It should list all items in a Shopcart"""
+        # get the id of a Shopcart
+        shopcart = self._create_shopcarts(1)[0]
+        items = self._create_items(5)
+        for item in items:
+            shopcart.items.append(item)
+        shopcart.create()
+        resp = self.client.get(
+            f"{BASE_URL}/{shopcart.id}"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        
+        data = resp.get_json()
+        for (expect_item, retriveved_item) in zip(shopcart.items, data["items"]):
+            self.assertEqual(expect_item.serialize(), retriveved_item)
+        resp = self.client.get(f"{BASE_URL}/123456", content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+
+        
