@@ -89,3 +89,34 @@ def check_content_type(media_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {media_type}",
     )
+
+#############################################################s#########
+# DELETE AN ITEM FROM SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["DELETE"])
+def delete_an_item_from_shopcart(shopcart_id, item_id):
+    """ Delete an item from shopcart """
+    app.logger.info(
+        "Request to delete an item with ID [%s] from shopcart with ID [%s]", item_id, shopcart_id)
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found.",
+        )
+    item_index = -1
+    for i, item in enumerate(shopcart.items):
+        if item.id == item_id:
+            item_index = i
+    if item_index == -1:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Item with id '{item_id}' could not be found.",
+        )
+    message = shopcart.items[item_index].serialize()
+    del shopcart.items[item_index]
+    location_url = url_for(
+        "get_shopcarts", shopcart_id=shopcart_id, _external=True)
+    app.logger.info(
+        "Item with ID [%s] has been deleted from the shopcart with ID [%s]", item_id, shopcart_id)
+    return jsonify(message), status.HTTP_204_NO_CONTENT, {"Location": location_url}
