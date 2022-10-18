@@ -26,6 +26,8 @@ def index():
 ######################################################################
 # CREATE A SHOPCART
 ######################################################################
+
+
 @app.route("/shopcarts", methods=["POST"])
 def create_shopcarts():
     """
@@ -42,7 +44,8 @@ def create_shopcarts():
 
     # Create a message to return
     message = shopcart.serialize()
-    location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
+    location_url = url_for(
+        "get_shopcarts", shopcart_id=shopcart.id, _external=True)
 
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
@@ -79,6 +82,7 @@ def init_db():
     global app
     Shopcart.init_db(app)
 
+
 def check_content_type(media_type):
     """Checks that the media type is correct"""
     content_type = request.headers.get("Content-Type")
@@ -90,9 +94,39 @@ def check_content_type(media_type):
         f"Content-Type must be {media_type}",
     )
 
+######################################################################
+# ADD AN ITEM TO SHOPCART
+######################################################################
+
+
+@app.route("/shopcarts/<int:shopcart_id>/items", methods=["POST"])
+def add_an_item_to_shopcart(shopcart_id):
+    """ Add an item to shopcart """
+    app.logger.info(
+        "Request to add an item to shopcart with id: %s", shopcart_id)
+    check_content_type("application/json")
+    item = Item()
+    item.deserialize(request.get_json())
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found.",
+        )
+    item.shopcart_id = shopcart_id
+    shopcart.items.append(item)
+    message = shopcart.serialize()
+    location_url = url_for(
+        "get_shopcarts", shopcart_id=shopcart.id, _external=True)
+    app.logger.info(
+        "Item with ID [%s] has been added to the shopcart with ID [%s]", item.id, shopcart_id)
+    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+
 #############################################################s#########
 # DELETE AN ITEM FROM SHOPCART
 ######################################################################
+
+
 @app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["DELETE"])
 def delete_an_item_from_shopcart(shopcart_id, item_id):
     """ Delete an item from shopcart """
