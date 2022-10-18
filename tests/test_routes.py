@@ -68,6 +68,14 @@ class TestShopcartServer(TestCase):
             shopcarts.append(shopcart)
         return shopcarts
 
+    def _create_items(self, count):
+        """ Factory method to create items in bulk """
+        items = []
+        for _ in range(count):
+            item = ItemFactory()
+            items.append(item)
+        return items
+
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
