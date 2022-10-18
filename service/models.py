@@ -100,6 +100,7 @@ class Item(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
+            self.id = data["id"]
             self.shopcart_id = data["shopcart_id"]
             self.name = data["name"]
             self.price = data["price"]

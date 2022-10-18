@@ -112,6 +112,38 @@ def list_all_shopcarts():
 
 
 ######################################################################
+# UPDATE A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["PUT"])
+def update_shopcart(shopcart_id):
+    """
+    Update a shopcart with JSON request.
+    Returns a 400 Error if the shopcart ID and URL does not match.
+    Returns a 200 OK with the updated content if the operation is successful.
+    """
+    app.logger.info("Updating Shopcart with id: %d", shopcart_id)
+    check_content_type("application/json")
+
+    data = request.get_json()
+    if data["id"] != shopcart_id:
+        abort(
+            status.HTTP_400_BAD_REQUEST,
+            f"Shopcart ID in JSON ({data['id']}) does not match",
+            f"the one in the request URL {shopcart_id}."
+        )
+
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found."
+        )
+    shopcart.deserialize(data)
+    shopcart.update()
+    return shopcart.serialize(), status.HTTP_200_OK
+
+
+######################################################################
 # RESET A SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/reset", methods=["PUT"])

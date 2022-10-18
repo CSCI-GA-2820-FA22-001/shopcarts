@@ -172,3 +172,45 @@ class TestShopcartServer(TestCase):
             f"{BASE_URL}/{shopcart_id}/reset"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_shopcart(self):
+        """It should update a shopcart with JSON content"""
+
+        # Create a fictional shopcart and POST it
+        shopcart = self._create_shopcarts(1)[0]
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="application/json"
+        )
+
+        # Create items and assign them to shopcart.items
+        items = self._create_items(randint(1, 5))
+        for item in items:
+            item.shopcart_id = shopcart.id
+        shopcart.items = items
+
+        # Update the Shopcart with JSON from shopcart
+        resp = self.client.put(
+            f"{BASE_URL}/{shopcart.id}",
+            json = shopcart.serialize(),
+            content_type="application/json"
+        )
+        # Check if successful
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(resp.get_json(), shopcart.serialize())
+
+        # Update a shopcart with shopcart_id in JSON unmatched
+        resp = self.client.put(
+            f"{BASE_URL}/{shopcart.id + randint(2,10)}",
+            json = shopcart.serialize(),
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # Update a non-existing shopcart
+        shopcart.id += randint(5, 10)
+        resp = self.client.put(
+            f"{BASE_URL}/{shopcart.id}",
+            json = shopcart.serialize(),
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
