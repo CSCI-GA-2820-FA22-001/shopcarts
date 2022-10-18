@@ -68,7 +68,7 @@ def list_shopcart_items(shopcart_id):
         )
     items = {"items": []}
     for item in shopcart.items:
-        items["items"].append(item)
+        items["items"].append(item.serialize())
     return (items, status.HTTP_200_OK)
 
 ######################################################################

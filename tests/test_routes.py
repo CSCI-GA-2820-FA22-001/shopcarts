@@ -129,7 +129,7 @@ class TestShopcartServer(TestCase):
             shopcart.items.append(item)
         shopcart.create()
         resp = self.client.get(
-            f"{BASE_URL}/{shopcart.id}"
+            f"{BASE_URL}/{shopcart.id}/items"
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         
