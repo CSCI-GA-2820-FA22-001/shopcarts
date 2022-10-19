@@ -124,3 +124,13 @@ class TestShopcartServer(TestCase):
             f"{BASE_URL}/{shopcart.id}"
         ) 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_list_all_shopcarts(self):
+        """It should List all existing shopcarts."""
+        shopcarts = [sc.serialize() for sc in self._create_shopcarts(5)]
+        resp = self.client.get(
+            f"{BASE_URL}"
+        )
+        resp_dict = resp.get_json()
+
+        self.assertEqual(resp_dict["shopcarts"], shopcarts)

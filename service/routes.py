@@ -94,6 +94,24 @@ def delete_shopcart(shopcart_id):
 
 
 ######################################################################
+# LIST ALL SHOPCARTS
+######################################################################
+@app.route("/shopcarts", methods=["GET"])
+def list_all_shopcarts():
+    """
+    List all shopcarts.
+    Returns a JSON that contains all shopcarts under the key 'shopcarts'.
+    """
+    shopcart = Shopcart()
+    shopcarts = {"shopcarts": []}
+    for sc in shopcart.all():
+        shopcarts["shopcarts"].append(sc.serialize())
+    app.logger.info(f"Retrieved shopcarts: {shopcarts}")
+
+    return shopcarts, status.HTTP_200_OK
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
