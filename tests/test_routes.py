@@ -7,6 +7,7 @@ Test cases can be run with the following:
 """
 import os
 import logging
+from random import randint
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from tests.factories import ShopcartFactory, ItemFactory
@@ -67,6 +68,16 @@ class TestShopcartServer(TestCase):
             shopcart.id = new_shopcart["id"]
             shopcarts.append(shopcart)
         return shopcarts
+
+    def _create_items(self, count):
+        """Factory method to create items in bulk"""
+        items = []
+        for _ in range(count):
+            item = ItemFactory()
+            items.append(item)
+
+        return items
+
 
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
@@ -134,3 +145,30 @@ class TestShopcartServer(TestCase):
         resp_dict = resp.get_json()
 
         self.assertEqual(resp_dict["shopcarts"], shopcarts)
+
+    def test_reset_shopcart(self):
+        """It should reset a shopcart (clear all items)."""
+        shopcart = self._create_shopcarts(1)[0]
+        shopcart.items = self._create_items(randint(0, 10))
+        resp = self.client.put(
+            f"{BASE_URL}/{shopcart.id}/reset"
+        )
+        resp_dict = resp.get_json()
+        
+        # check if the list of items is cleared
+        self.assertEqual(len(resp_dict["items"]), 0)
+
+        # check if the rest of the shopcart info remains the same
+        cleared_shopcart = shopcart
+        cleared_shopcart.items.clear()
+        self.assertEqual(resp_dict, cleared_shopcart.serialize())
+
+        # check if the function behaves given that the shopcart does not exist
+        shopcart_id = shopcart.id
+        resp = self.client.delete(
+            f"{BASE_URL}/{shopcart.id}"
+        )
+        resp = self.client.put(
+            f"{BASE_URL}/{shopcart_id}/reset"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

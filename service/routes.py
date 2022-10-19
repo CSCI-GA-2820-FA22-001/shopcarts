@@ -112,6 +112,29 @@ def list_all_shopcarts():
 
 
 ######################################################################
+# RESET A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/reset", methods=["PUT"])
+def reset_shopcart(shopcart_id):
+    """
+    Reset a shopcart.
+    Returns a 404 Error if the shopcart does not exist.
+    Returns a 200 OK with the updated content if the operation is successful.
+    """
+    app.logger.info("Resetting Shopcart with id: %d", shopcart_id)
+
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found."
+        )
+    shopcart.items.clear()
+    shopcart.update()
+    return shopcart.serialize(), status.HTTP_200_OK
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
