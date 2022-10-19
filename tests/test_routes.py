@@ -99,7 +99,7 @@ class TestShopcartServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_shopcart = resp.get_json()
         self.assertEqual(new_shopcart["customer_id"], shopcart.customer_id, "customer_id does not match")
-        
+
     def test_get_account(self):
         """It should Read a single Shopcart"""
         # get the id of a Shopcart
@@ -111,4 +111,16 @@ class TestShopcartServer(TestCase):
         data = resp.get_json()
         self.assertEqual(data["id"], shopcart.id)
         resp = self.client.get(f"{BASE_URL}/123456", content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_shopcart(self):
+        """It should Delete a shopcart with a specific ID"""
+        shopcart = self._create_shopcarts(1)[0]
+        resp = self.client.delete(
+            f"{BASE_URL}/{shopcart.id}"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        resp = self.client.delete(
+            f"{BASE_URL}/{shopcart.id}"
+        ) 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

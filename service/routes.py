@@ -69,6 +69,30 @@ def get_shopcarts(shopcart_id):
         )
     return make_response(jsonify(shopcart.serialize()), status.HTTP_200_OK)
 
+
+######################################################################
+# DELETE A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>", methods=["DELETE"])
+def delete_shopcart(shopcart_id):
+    """
+    Delete a single Shopcart.
+    This endpoint deletes a shopcart with a specific shopcart ID.
+    If no such shopcart exists, return not found.
+    """
+    app.logger.info("Deleting Shopcart with id: %d", shopcart_id)
+    
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found."
+        )
+
+    shopcart.delete()
+    return {}, status.HTTP_204_NO_CONTENT
+
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
