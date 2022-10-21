@@ -4,9 +4,9 @@ My Service
 Describe what your service does here
 """
 
-from flask import Flask, jsonify, request, url_for, make_response, abort
+from flask import jsonify, request, url_for, make_response, abort
 from .common import status  # HTTP Status Codes
-from service.models import Shopcart, Item, DataValidationError
+from service.models import Shopcart
 
 # Import Flask application
 from . import app
@@ -22,6 +22,7 @@ def index():
         "Reminder: return some useful information in json format about the service here",
         status.HTTP_200_OK,
     )
+
 
 ######################################################################
 # CREATE A SHOPCART
@@ -48,6 +49,28 @@ def create_shopcarts():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
+######################################################################
+# READ A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items", methods=["GET"])
+def list_shopcart_items(shopcart_id):
+    """
+    List all items in a Shopcart
+
+    This endpoint will return a Item list based on the Shopcart id
+    """
+    app.logger.info("Request for items in Shopcart with id: %s", shopcart_id)
+
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found.",
+        )
+    items = {"items": []}
+    for item in shopcart.items:
+        items["items"].append(item.serialize())
+    return (items, status.HTTP_200_OK)
 
 ######################################################################
 # READ A SHOPCART
@@ -81,7 +104,7 @@ def delete_shopcart(shopcart_id):
     If no such shopcart exists, return not found.
     """
     app.logger.info("Deleting Shopcart with id: %d", shopcart_id)
-    
+
     shopcart = Shopcart.find(shopcart_id)
     if not shopcart:
         abort(
@@ -201,6 +224,7 @@ def init_db():
     """ Initializes the SQLAlchemy app """
     global app
     Shopcart.init_db(app)
+
 
 def check_content_type(media_type):
     """Checks that the media type is correct"""
