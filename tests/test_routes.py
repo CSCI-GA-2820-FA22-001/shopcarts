@@ -24,6 +24,8 @@ BASE_URL = "/shopcarts"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
 class TestShopcartServer(TestCase):
     """ REST API Server Tests """
 
@@ -39,11 +41,10 @@ class TestShopcartServer(TestCase):
     @classmethod
     def tearDownClass(cls):
         """ This runs once after the entire test suite """
-        
 
     def setUp(self):
         """ This runs before each test """
-        db.drop_all()  
+        db.drop_all()
         db.create_all()
         self.client = app.test_client()
 
@@ -70,7 +71,6 @@ class TestShopcartServer(TestCase):
         return shopcarts
 
     def _create_items(self, count):
-
         """Factory method to create items in bulk"""
         items = []
         for _ in range(count):
@@ -79,7 +79,13 @@ class TestShopcartServer(TestCase):
 
         return items
 
-
+    def _create_items(self, count):
+        """ Factory method to create items in bulk """
+        items = []
+        for _ in range(count):
+            item = ItemFactory()
+            items.append(item)
+        return items
 
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
@@ -104,14 +110,22 @@ class TestShopcartServer(TestCase):
 
         # Check the data is correct
         new_shopcart = resp.get_json()
-        self.assertEqual(new_shopcart["customer_id"], shopcart.customer_id, "customer_id does not match")
-  
+        self.assertEqual(
+            new_shopcart["customer_id"], shopcart.customer_id, "customer_id does not match")
 
         # Check that the location header was correct by getting it
         resp = self.client.get(location, content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_shopcart = resp.get_json()
-        self.assertEqual(new_shopcart["customer_id"], shopcart.customer_id, "customer_id does not match")
+        self.assertEqual(
+            new_shopcart["customer_id"], shopcart.customer_id, "customer_id does not match")
+
+        resp = self.client.post("/shopcarts", json=shopcart.serialize(), content_type="test/html"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+        resp = self.client.post("/shopcarts", json={"name": "not enough data"}, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_account(self):
         """It should Read a single Shopcart"""
@@ -123,9 +137,22 @@ class TestShopcartServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data["id"], shopcart.id)
-        resp = self.client.get(f"{BASE_URL}/123456", content_type="application/json")
+        resp = self.client.get(f"{BASE_URL}/123456",
+                               content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_delete_an_item_from_shopcart(self):
+        """It should delete an item from a shopcart"""
+        shopcart = self._create_shopcarts(1)[0]
+        item = self._create_items(1)[0]
+        item.shopcart_id = shopcart.id
+        self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items", json=item.serialize(), content_type="application/json"
+        )
+        resp = self.client.delete(f"{BASE_URL}/{shopcart.id}/items/{item.id}")
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        resp = self.client.delete(f"{BASE_URL}/{shopcart.id}/items/{item.id}")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_list_item(self):
         """It should list all items in a Shopcart"""
@@ -139,11 +166,10 @@ class TestShopcartServer(TestCase):
             f"{BASE_URL}/{shopcart.id}/items"
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        
+
         data = resp.get_json()
         for (expect_item, retriveved_item) in zip(shopcart.items, data["items"]):
             self.assertEqual(expect_item.serialize(), retriveved_item)
-        
 
     def test_delete_shopcart(self):
         """It should Delete a shopcart with a specific ID"""
@@ -154,7 +180,7 @@ class TestShopcartServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         resp = self.client.delete(
             f"{BASE_URL}/{shopcart.id}"
-        ) 
+        )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_list_all_shopcarts(self):
@@ -175,7 +201,7 @@ class TestShopcartServer(TestCase):
             f"{BASE_URL}/{shopcart.id}/reset"
         )
         resp_dict = resp.get_json()
-        
+
         # check if the list of items is cleared
         self.assertEqual(len(resp_dict["items"]), 0)
 
@@ -212,7 +238,7 @@ class TestShopcartServer(TestCase):
         # Update the Shopcart with JSON from shopcart
         resp = self.client.put(
             f"{BASE_URL}/{shopcart.id}",
-            json = shopcart.serialize(),
+            json=shopcart.serialize(),
             content_type="application/json"
         )
         # Check if successful
@@ -222,7 +248,7 @@ class TestShopcartServer(TestCase):
         # Update a shopcart with shopcart_id in JSON unmatched
         resp = self.client.put(
             f"{BASE_URL}/{shopcart.id + randint(2,10)}",
-            json = shopcart.serialize(),
+            json=shopcart.serialize(),
             content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
@@ -231,8 +257,23 @@ class TestShopcartServer(TestCase):
         shopcart.id += randint(5, 10)
         resp = self.client.put(
             f"{BASE_URL}/{shopcart.id}",
-            json = shopcart.serialize(),
+            json=shopcart.serialize(),
             content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+        resp = self.client.put(
+            "/shopcarts", 
+            json={"abc": "defg"}, 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_add_an_item_to_shopcart(self):
+        """It should add an item to a shopcart"""
+        shopcart = self._create_shopcarts(1)[0]
+        item = self._create_items(1)[0]
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items", json=item.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
