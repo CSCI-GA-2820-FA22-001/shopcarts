@@ -15,6 +15,7 @@ db = SQLAlchemy()
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
 
+
 ######################################################################
 #  P E R S I S T E N T   B A S E   M O D E L
 ######################################################################
@@ -84,13 +85,17 @@ class Item(db.Model, PersistentBase):
     quantity = db.Column(db.Integer, nullable=False)
     color = db.Column(db.String(16))
 
-
     def __repr__(self):
         return f"<Item {self.name} id=[{self.id}] shopcart[{self.shopcart_id}]>"
 
     def serialize(self):
         """ Serializes a Item into a dictionary """
-        return {"id": self.id, "shopcart_id": self.shopcart_id, "name": self.name, "price": self.price, "quantity": self.quantity, "color": self.color}
+        return {"id": self.id,
+                "shopcart_id": self.shopcart_id,
+                "name": self.name,
+                "price": self.price,
+                "quantity": self.quantity,
+                "color": self.color}
 
     def deserialize(self, data):
         """
@@ -100,6 +105,7 @@ class Item(db.Model, PersistentBase):
             data (dict): A dictionary containing the resource data
         """
         try:
+            self.id = data["id"]
             self.shopcart_id = data["shopcart_id"]
             self.id = data["id"]
             self.name = data["name"]
@@ -127,6 +133,7 @@ class Item(db.Model, PersistentBase):
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
 
+
 ######################################################################
 #  S H O P C A R T   M O D E L
 ######################################################################
@@ -139,13 +146,12 @@ class Shopcart(db.Model, PersistentBase):
     customer_id = db.Column(db.Integer, nullable=False)
     items = db.relationship("Item", backref="shopcart", passive_deletes=True)
 
-
     def __repr__(self):
         return f"<Shopcart {self.id} customer {self.customer_id}>"
 
     def serialize(self):
         """ Serializes a Shopcart into a dictionary """
-        shopcart =  {"id": self.id, "customer_id": self.customer_id, "items": []}
+        shopcart = {"id": self.id, "customer_id": self.customer_id, "items": []}
         for item in self.items:
             shopcart["items"].append(item.serialize())
         return shopcart
@@ -174,4 +180,3 @@ class Shopcart(db.Model, PersistentBase):
                 "Error message: " + error.args[0]
             )
         return self
-
