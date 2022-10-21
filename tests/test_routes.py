@@ -236,3 +236,11 @@ class TestShopcartServer(TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_add_an_item_to_shopcart(self):
+        """It should add an item to a shopcart"""
+        shopcart = self._create_shopcarts(1)[0]
+        item = self._create_items(1)[0]
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items", json=item.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
