@@ -6,7 +6,7 @@ Describe what your service does here
 
 from flask import jsonify, request, url_for, make_response, abort
 from .common import status  # HTTP Status Codes
-from service.models import Shopcart, Item, DataValidationError
+from service.models import Shopcart
 
 # Import Flask application
 from . import app
@@ -43,8 +43,7 @@ def create_shopcarts():
 
     # Create a message to return
     message = shopcart.serialize()
-    location_url = url_for(
-        "get_shopcarts", shopcart_id=shopcart.id, _external=True)
+    location_url = url_for("get_shopcarts", shopcart_id=shopcart.id, _external=True)
 
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
@@ -53,8 +52,6 @@ def create_shopcarts():
 ######################################################################
 # READ A SHOPCART
 ######################################################################
-
-
 @app.route("/shopcarts/<int:shopcart_id>/items", methods=["GET"])
 def list_shopcart_items(shopcart_id):
     """
@@ -78,8 +75,6 @@ def list_shopcart_items(shopcart_id):
 ######################################################################
 # READ A SHOPCART
 ######################################################################
-
-
 @app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
 def get_shopcarts(shopcart_id):
     """
@@ -215,31 +210,3 @@ def check_content_type(media_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {media_type}",
     )
-
-######################################################################
-# ADD AN ITEM TO SHOPCART
-######################################################################
-
-
-@app.route("/shopcarts/<int:shopcart_id>/items", methods=["POST"])
-def add_an_item_to_shopcart(shopcart_id):
-    """ Add an item to shopcart """
-    app.logger.info(
-        "Request to add an item to shopcart with id: %s", shopcart_id)
-    check_content_type("application/json")
-    item = Item()
-    item.deserialize(request.get_json())
-    shopcart = Shopcart.find(shopcart_id)
-    if not shopcart:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Shopcart with id '{shopcart_id}' could not be found.",
-        )
-    item.shopcart_id = shopcart_id
-    shopcart.items.append(item)
-    message = shopcart.serialize()
-    location_url = url_for(
-        "get_shopcarts", shopcart_id=shopcart.id, _external=True)
-    app.logger.info(
-        "Item with ID [%s] has been added to the shopcart with ID [%s]", item.id, shopcart_id)
-    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
