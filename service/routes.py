@@ -167,6 +167,32 @@ def reset_shopcart(shopcart_id):
 
 
 ######################################################################
+# READ AN ITEM FROM A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["GET"])
+def read_item(shopcart_id, item_id):
+    """
+    Read an item from a shopcart.
+    Returns JSON of the item if it exists and the shopcart exists.
+    Returns a 404 Error if either of the item or the shopcart does not exist.
+    """
+    app.logger.info("Reading Item %d from Shopcart %d", item_id, shopcart_id)
+
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found."
+        )
+
+    for item in shopcart.items:
+        if item.id == item_id:
+            return item.serialize(), status.HTTP_200_OK
+
+    return "Item not found", status.HTTP_404_NOT_FOUND
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
