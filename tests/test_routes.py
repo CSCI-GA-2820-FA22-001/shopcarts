@@ -141,7 +141,7 @@ class TestShopcartServer(TestCase):
                                content_type="application/json")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_delete_an_item_to_shopcart(self):
+    def test_delete_an_item_from_shopcart(self):
         """It should delete an item from a shopcart"""
         shopcart = self._create_shopcarts(1)[0]
         item = self._create_items(1)[0]
