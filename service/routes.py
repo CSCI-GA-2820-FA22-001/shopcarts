@@ -7,6 +7,7 @@ Describe what your service does here
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from .common import status  # HTTP Status Codes
 from service.models import Shopcart, Item, DataValidationError
+from collections import defaultdict
 
 # Import Flask application
 from . import app
@@ -190,6 +191,50 @@ def read_item(shopcart_id, item_id):
             return item.serialize(), status.HTTP_200_OK
 
     return "Item not found", status.HTTP_404_NOT_FOUND
+
+######################################################################
+# CHECKOUT ITEMS FROM A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/checkout", methods=["POST"])
+def checkout_items(shopcart_id):
+    """
+    Checkout selected items in a shopcart.
+    Returns JSON of a list of selected items; remove these items from shopcart.
+    Returns a 404 Error if any item is not in the item list of the shopcart.
+    Returns a 404 Error if the shopcart does not exist.
+    """
+    app.logger.info("Checking out items from Shopcart %d", shopcart_id)
+
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found."
+        )
+
+    # data = request.get_json()
+    item_ids_to_checkout = request.get_json()["items"]
+
+    # TODO(allenpthuang): inefficient. Do we want to make `id` a key?
+    items_dict = defaultdict(Item)
+    for item in shopcart.items:
+        items_dict[item.id] = item
+
+    items_to_checkout = {"items": []}
+    for id in item_ids_to_checkout:
+        try:
+            items_to_checkout["items"].append(items_dict[id].serialize())
+            items_dict.pop(id)
+        except KeyError:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                f"Item with id '{id}' does not exist in Shopcart '{shopcart_id}"
+            )
+
+    shopcart.items = [item for _, item in items_dict.items()]
+    # shopcart.update()
+
+    return items_to_checkout, status.HTTP_200_OK
 
 
 ######################################################################
