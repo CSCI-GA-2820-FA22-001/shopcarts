@@ -107,6 +107,7 @@ class Item(db.Model, PersistentBase):
         try:
             self.id = data["id"]
             self.shopcart_id = data["shopcart_id"]
+            self.id = data["id"]
             self.name = data["name"]
             self.price = data["price"]
             self.quantity = data["quantity"]
