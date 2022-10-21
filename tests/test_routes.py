@@ -7,6 +7,7 @@ Test cases can be run with the following:
 """
 import os
 import logging
+from random import randint
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from tests.factories import ShopcartFactory, ItemFactory
@@ -107,7 +108,7 @@ class TestShopcartServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_shopcart = resp.get_json()
         self.assertEqual(new_shopcart["customer_id"], shopcart.customer_id, "customer_id does not match")
-        
+
     def test_get_account(self):
         """It should Read a single Shopcart"""
         # get the id of a Shopcart
