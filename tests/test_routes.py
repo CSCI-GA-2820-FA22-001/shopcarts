@@ -113,6 +113,13 @@ class TestShopcartServer(TestCase):
         new_shopcart = resp.get_json()
         self.assertEqual(new_shopcart["customer_id"], shopcart.customer_id, "customer_id does not match")
 
+        resp = self.client.post("/shopcarts", json=shopcart.serialize(), content_type="test/html"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+        resp = self.client.post("/shopcarts", json={"name": "not enough data"}, content_type="application/json")
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_get_account(self):
         """It should Read a single Shopcart"""
         # get the id of a Shopcart
@@ -235,4 +242,11 @@ class TestShopcartServer(TestCase):
             content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        resp = self.client.put(
+            "/shopcarts", 
+            json={"abc": "defg"}, 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
