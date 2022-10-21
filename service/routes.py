@@ -48,6 +48,28 @@ def create_shopcarts():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
+######################################################################
+# READ A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items", methods=["GET"])
+def list_shopcart_items(shopcart_id):
+    """
+    List all items in a Shopcart
+
+    This endpoint will return a Item list based on the Shopcart id
+    """
+    app.logger.info("Request for items in Shopcart with id: %s", shopcart_id)
+
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found.",
+        )
+    items = {"items": []}
+    for item in shopcart.items:
+        items["items"].append(item.serialize())
+    return (items, status.HTTP_200_OK)
 
 ######################################################################
 # READ A SHOPCART
