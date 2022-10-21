@@ -19,7 +19,10 @@ from . import app
 def index():
     """ Root URL response """
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="Shopcart REST API Service",
+            version="1.0",
+        ),
         status.HTTP_200_OK,
     )
 
@@ -52,6 +55,7 @@ def create_shopcarts():
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
     )
 
+
 ######################################################################
 # READ A SHOPCART
 ######################################################################
@@ -76,6 +80,7 @@ def list_shopcart_items(shopcart_id):
     for item in shopcart.items:
         items["items"].append(item.serialize())
     return (items, status.HTTP_200_OK)
+
 
 ######################################################################
 # READ A SHOPCART
