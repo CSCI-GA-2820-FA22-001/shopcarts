@@ -18,10 +18,10 @@ from . import app
 @app.route("/")
 def index():
     """ Root URL response """
-    return (
-        "Reminder: return some useful information in json format about the service here",
-        status.HTTP_200_OK,
-    )
+    return jsonify(
+        status=status.HTTP_200_OK,
+        message="Shopcart services available at /shopcarts",
+    ), status.HTTP_200_OK
 
 
 ######################################################################
@@ -50,7 +50,7 @@ def create_shopcarts():
     )
 
 ######################################################################
-# READ A SHOPCART
+# READ ITEMS FROM A SHOPCART
 ######################################################################
 @app.route("/shopcarts/<int:shopcart_id>/items", methods=["GET"])
 def list_shopcart_items(shopcart_id):
