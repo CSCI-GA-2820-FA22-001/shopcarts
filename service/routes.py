@@ -4,9 +4,9 @@ My Service
 Describe what your service does here
 """
 
-from flask import Flask, jsonify, request, url_for, make_response, abort
+from flask import jsonify, request, url_for, make_response, abort
 from .common import status  # HTTP Status Codes
-from service.models import Shopcart, Item, DataValidationError
+from service.models import Shopcart
 
 # Import Flask application
 from . import app
@@ -22,6 +22,7 @@ def index():
         "Reminder: return some useful information in json format about the service here",
         status.HTTP_200_OK,
     )
+
 
 ######################################################################
 # CREATE A SHOPCART
@@ -81,7 +82,7 @@ def delete_shopcart(shopcart_id):
     If no such shopcart exists, return not found.
     """
     app.logger.info("Deleting Shopcart with id: %d", shopcart_id)
-    
+
     shopcart = Shopcart.find(shopcart_id)
     if not shopcart:
         abort(
@@ -175,6 +176,7 @@ def init_db():
     """ Initializes the SQLAlchemy app """
     global app
     Shopcart.init_db(app)
+
 
 def check_content_type(media_type):
     """Checks that the media type is correct"""
