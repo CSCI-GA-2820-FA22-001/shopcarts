@@ -219,7 +219,14 @@ def read_item(shopcart_id, item_id):
         if item.id == item_id:
             return item.serialize(), status.HTTP_200_OK
 
-    return "Item not found", status.HTTP_404_NOT_FOUND
+    return (
+        jsonify(
+            error="Not Found",
+            status=status.HTTP_404_NOT_FOUND,
+            message=f"Item with id '{item_id} cannot be found in Shopcart with id '{shopcart_id}"
+        ),
+        status.HTTP_404_NOT_FOUND
+    )
 
 
 ######################################################################
