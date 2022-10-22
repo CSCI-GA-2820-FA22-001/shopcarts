@@ -277,3 +277,47 @@ class TestShopcartServer(TestCase):
             f"{BASE_URL}/{shopcart.id}/items", json=item.serialize(), content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+    def test_read_item(self):
+        """ It should return a JSON of the specified item."""
+        # Create a fictional shopcart and POST it
+        shopcart = self._create_shopcarts(1)[0]
+
+        # Create items and assign them to shopcart.items
+        items = self._create_items(randint(1, 5))
+        shopcart.items = items
+
+        resp = self.client.post(
+            BASE_URL, json=shopcart.serialize(), content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # TODO(allenpthunag): we might need to fix this behaviour
+        # `id` in shopcart JSON is ignored, a new id is created
+        # current hack is to use the shopcart_id from server response
+        shopcart_id = resp.get_json()["id"]
+        for item in items:
+            item.shopcart_id = shopcart_id
+
+        # try to read an item that we created above
+        item_to_read = items[randint(0, len(items) - 1)]
+        resp = self.client.get(
+            f"{BASE_URL}/{shopcart_id}/items/{item_to_read.id}"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.get_json(), item_to_read.serialize())
+
+        # try to read from a non-existing shopcart
+        resp = self.client.get(
+            f"{BASE_URL}/{shopcart_id + randint(5, 10)}/items/{item_to_read.id}"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # try to read a non-existing item
+        non_existing_item_id = 0
+        for item in items:
+            non_existing_item_id += item.id
+        resp = self.client.get(
+            f"{BASE_URL}/{shopcart_id}/items/{non_existing_item_id}"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
