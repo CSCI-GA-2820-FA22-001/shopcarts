@@ -31,8 +31,6 @@ def index():
 ######################################################################
 # CREATE A SHOPCART
 ######################################################################
-
-
 @app.route("/shopcarts", methods=["POST"])
 def create_shopcarts():
     """
@@ -60,8 +58,6 @@ def create_shopcarts():
 ######################################################################
 # READ ITEMS FROM A SHOPCART
 ######################################################################
-
-
 @app.route("/shopcarts/<int:shopcart_id>/items", methods=["GET"])
 def list_shopcart_items(shopcart_id):
     """
@@ -86,8 +82,6 @@ def list_shopcart_items(shopcart_id):
 ######################################################################
 # READ A SHOPCART
 ######################################################################
-
-
 @app.route("/shopcarts/<int:shopcart_id>", methods=["GET"])
 def get_shopcarts(shopcart_id):
     """
@@ -203,32 +197,8 @@ def reset_shopcart(shopcart_id):
 
 
 ######################################################################
-#  U T I L I T Y   F U N C T I O N S
-######################################################################
-
-
-def init_db():
-    """ Initializes the SQLAlchemy app """
-    global app
-    Shopcart.init_db(app)
-
-
-def check_content_type(media_type):
-    """Checks that the media type is correct"""
-    content_type = request.headers.get("Content-Type")
-    if content_type and content_type == media_type:
-        return
-    app.logger.error("Invalid Content-Type: %s", content_type)
-    abort(
-        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        f"Content-Type must be {media_type}",
-    )
-
-######################################################################
 # ADD AN ITEM TO SHOPCART
 ######################################################################
-
-
 @app.route("/shopcarts/<int:shopcart_id>/items", methods=["POST"])
 def add_an_item_to_shopcart(shopcart_id):
     """ Add an item to shopcart """
@@ -251,6 +221,7 @@ def add_an_item_to_shopcart(shopcart_id):
     app.logger.info(
         "Item with ID [%s] has been added to the shopcart with ID [%s]", item.id, shopcart_id)
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+
 
 #############################################################s#########
 # DELETE AN ITEM FROM SHOPCART
@@ -282,3 +253,24 @@ def delete_an_item_from_shopcart(shopcart_id, item_id):
     app.logger.info(
         "Item with ID [%s] has been deleted from the shopcart with ID [%s]", item_id, shopcart_id)
     return jsonify(message), status.HTTP_204_NO_CONTENT, {"Location": location_url}
+
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+def init_db():
+    """ Initializes the SQLAlchemy app """
+    global app
+    Shopcart.init_db(app)
+
+
+def check_content_type(media_type):
+    """Checks that the media type is correct"""
+    content_type = request.headers.get("Content-Type")
+    if content_type and content_type == media_type:
+        return
+    app.logger.error("Invalid Content-Type: %s", content_type)
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        f"Content-Type must be {media_type}",
+    )
