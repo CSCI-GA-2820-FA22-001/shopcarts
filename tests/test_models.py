@@ -124,7 +124,7 @@ class TestShopcart(unittest.TestCase):
         # Assert that there are not 5 shopcarts in the database
         shopcarts = Shopcart.all()
         self.assertEqual(len(shopcarts), 5)
-
+        
     def test_serialize_an_shopcart(self):
         """It should Serialize an shopcart"""
         shopcart = ShopcartFactory()
@@ -245,3 +245,28 @@ class TestShopcart(unittest.TestCase):
         # Fetch it back again
         shopcart = Shopcart.find(shopcart.id)
         self.assertEqual(len(shopcart.items), 0)
+
+    def test_find_by_shopcart_id_and_customer_id(self):
+        """It should Find Shopcarts by shopcart_id and customer_id"""
+        shopcart = ShopcartFactory()
+        shopcart.create()
+
+        same_shopcart = Shopcart.find_by_shopcart_id_and_customer_id(shopcart.id, shopcart.customer_id)[0]
+        self.assertEqual(shopcart.id, same_shopcart.id)
+        self.assertEqual(shopcart.customer_id, same_shopcart.customer_id)
+
+    def test_find_by_shopcart_id(self):
+        """It should Find Shopcarts by shopcart_id"""
+        shopcart = ShopcartFactory()
+        shopcart.create()
+
+        same_shopcart = Shopcart.find_by_shopcart_id(shopcart.id)[0]
+        self.assertEqual(shopcart.id, same_shopcart.id)
+
+    def test_find_by_customer_id(self):
+        """It should Find Shopcarts by customer_id"""
+        shopcart = ShopcartFactory()
+        shopcart.create()
+
+        same_shopcart = Shopcart.find_by_customer_id(shopcart.customer_id)[0]
+        self.assertEqual(shopcart.customer_id, same_shopcart.customer_id)
