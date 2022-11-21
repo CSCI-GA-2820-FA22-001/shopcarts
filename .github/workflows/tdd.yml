@@ -5,4 +5,6 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
+      - run: pwd
+      - run: ls -l
       - run: python -m unittest tests/test_routes.py
