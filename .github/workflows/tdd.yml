@@ -6,5 +6,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: pwd
-      - run: ls -l
+      - run: ls 
+      - name: Install dependencies
+        run: |
+          cd $GITHUB_WORKSPACE
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - run: python -m unittest tests/test_routes.py
