@@ -1,0 +1,8 @@
+name: Unit Test
+run-name: ${{ github.actor }} is testing 
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - run: python -m unittest tests/test_routes.py
