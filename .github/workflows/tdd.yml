@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: pwd
-      - uses: actions/checkout@dev/addGitAction
+      - uses: actions/checkout@dev\/addGitAction
       - run: ls 
       - name: Install dependencies
         run: |
