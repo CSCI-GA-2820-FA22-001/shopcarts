@@ -308,29 +308,24 @@ def checkout_items(shopcart_id):
             f"Shopcart with id '{shopcart_id}' could not be found."
         )
 
-    # data = request.get_json()
-    item_ids_to_checkout = request.get_json()["items"]
-
-    # TODO(allenpthuang): inefficient. Do we want to make `id` a key?
-    items_dict = defaultdict(Item)
-    for item in shopcart.items:
-        items_dict[item.id] = item
-
-    items_to_checkout = {"items": []}
-    for id in item_ids_to_checkout:
-        try:
-            items_to_checkout["items"].append(items_dict[id].serialize())
-            items_dict.pop(id)
-        except KeyError:
+    items_to_checkout = request.get_json()["items"]
+    for item in items_to_checkout:
+        item_looked_up = Item.find(item["id"])
+        if not item_looked_up:
             abort(
                 status.HTTP_404_NOT_FOUND,
-                f"Item with id '{id}' does not exist in Shopcart '{shopcart_id}"
+                f"item with id {item['id']} could not be found."
             )
+        elif item_looked_up.shopcart_id != shopcart_id:
+            abort(
+                status.HTTP_403_FORBIDDEN,
+                f"item with id {item['id']} does not belong to shopcart"
+                + f" with id {shopcart_id}."
+            )
+        else:
+            item_looked_up.delete()
 
-    shopcart.items = [item for _, item in items_dict.items()]
-    # shopcart.update()
-
-    return items_to_checkout, status.HTTP_200_OK
+    return request.get_json(), status.HTTP_200_OK
 
 
 ######################################################################

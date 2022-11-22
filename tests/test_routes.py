@@ -327,62 +327,53 @@ class TestShopcartServer(TestCase):
         # Create a fictional shopcart and POST it
         shopcart = self._create_shopcarts(1)[0]
 
-        # Create items and assign them to shopcart.items
+        # Create items and POST them to the shopcart
         items = self._create_items(randint(5, 10))
-        shopcart.items = items
-
-        resp = self.client.post(
-            BASE_URL, json=shopcart.serialize(), content_type="application/json"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-
-        # TODO(allenpthunag): we might need to fix this behaviour
-        # `id` in shopcart JSON is ignored, a new id is created
-        # current hack is to use the shopcart_id from server response
-        shopcart_id = resp.get_json()["id"]
         for item in items:
-            item.shopcart_id = shopcart_id
+            resp = self.client.post(
+                f"{BASE_URL}/{shopcart.id}/items",
+                json=item.serialize(),
+                content_type="application/json"
+            )
 
-        items_to_checkout = sample(items, 5)
-        item_ids_to_checkout_dict = {"items": []}
-        item_ids_to_checkout_dict["items"] = [item.id for item in items_to_checkout]
+        # sample some of the items to be checked out
+        items_to_checkout = sample(items, randint(1, 5))
 
+        # prepare a dict to POST
+        checkout_dict = {"items": []}
+        for item in items_to_checkout:
+            checkout_dict["items"].append(item.serialize())
+
+        # try POSTing to a non-existing shopcart
         resp = self.client.post(
-            f"{BASE_URL}/{shopcart_id}/checkout",
-            # json=json.dumps(item_ids_to_checkout_dict),
-            json=item_ids_to_checkout_dict,
-            content_type="application/json"
-        )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp.get_json()["items"], [item.serialize() for item in items_to_checkout])
-
-        resp = self.client.get(
-            f"{BASE_URL}/{shopcart_id}"
-        )
-        items_from_server = resp.get_json()["items"]
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(items_from_server) + len(items_to_checkout), len(items))
-
-        remainder_items = [item.serialize() for item in items if item not in items_to_checkout]
-        self.assertEqual(items_from_server, remainder_items)
-
-        resp = self.client.post(
-            f"{BASE_URL}/{shopcart_id + randint(5, 10)}/checkout",
-            # json=json.dumps(item_ids_to_checkout_dict),
-            json=item_ids_to_checkout_dict,
+            f"{BASE_URL}/{shopcart.id + randint(42, 56)}/checkout",
+            json=checkout_dict,
             content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
-        non_existing_item_id = 0
-        for item in items:
-            non_existing_item_id += item.id
-
-        item_ids_to_checkout_dict["items"] = [non_existing_item_id]
+        # try POSTing to a shopcart that does not have these items
+        other_shopcart = self._create_shopcarts(1)[0]
         resp = self.client.post(
-            f"{BASE_URL}/{shopcart_id}/checkout",
-            # json=json.dumps(item_ids_to_checkout_dict),
-            json=item_ids_to_checkout_dict,
+            f"{BASE_URL}/{other_shopcart.id}/checkout",
+            json=checkout_dict,
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+        # happy path
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/checkout",
+            json=checkout_dict,
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.get_json(), checkout_dict)
+
+        # try to checkout the same set of items again
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/checkout",
+            json=checkout_dict,
             content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
