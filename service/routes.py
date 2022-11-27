@@ -238,18 +238,22 @@ def add_an_item_to_shopcart(shopcart_id):
     app.logger.info(
         "Request to add an item to shopcart with id: %s", shopcart_id)
     check_content_type("application/json")
-    item = Item()
-    # temp_item is the data in request plus the shopcart_id
-    temp_item = request.get_json()
-    temp_item["shopcart_id"] = shopcart_id
-    item.deserialize(temp_item)
     shopcart = Shopcart.find(shopcart_id)
     if not shopcart:
         abort(
             status.HTTP_404_NOT_FOUND,
             f"Shopcart with id '{shopcart_id}' could not be found.",
         )
-    shopcart.items.append(item)
+    # temp_item is the data in request
+    temp_item = request.get_json()
+    item = Item.find(temp_item["id"])
+    if item:
+        item.quantity += temp_item["quantity"]
+    else:
+        item = Item()
+        temp_item["shopcart_id"] = shopcart_id
+        item.deserialize(temp_item)
+        shopcart.items.append(item)
     message = shopcart.serialize()
     location_url = url_for(
         "get_shopcarts", shopcart_id=shopcart.id, _external=True)
