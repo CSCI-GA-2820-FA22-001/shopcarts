@@ -16,6 +16,8 @@ DATABASE_URI = os.getenv(
 ######################################################################
 #  S H O P C A R T   M O D E L   T E S T   C A S E S
 ######################################################################
+
+
 class TestShopcart(unittest.TestCase):
     """ Test Cases for Shopcart Model """
 
@@ -31,11 +33,10 @@ class TestShopcart(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """ This runs once after the entire test suite """
-        
 
     def setUp(self):
         """ This runs before each test """
-        db.drop_all()  
+        db.drop_all()
         db.create_all()
 
     def tearDown(self):
@@ -54,8 +55,8 @@ class TestShopcart(unittest.TestCase):
         """It should Create a Shopcart and assert that it exists """
         fake_shopcart = ShopcartFactory()
         shopcart = Shopcart(
-            id=fake_shopcart.id, 
-            customer_id=fake_shopcart.customer_id, 
+            id=fake_shopcart.id,
+            customer_id=fake_shopcart.customer_id,
         )
         self.assertIsNotNone(shopcart)
         self.assertEqual(shopcart.id, fake_shopcart.id)
