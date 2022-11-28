@@ -146,7 +146,6 @@ class TestShopcartServer(TestCase):
         """It should delete an item from a shopcart"""
         shopcart = self._create_shopcarts(1)[0]
         item = self._create_items(1)[0]
-        item.shopcart_id = shopcart.id
         self.client.post(
             f"{BASE_URL}/{shopcart.id}/items", json=item.serialize(), content_type="application/json"
         )
