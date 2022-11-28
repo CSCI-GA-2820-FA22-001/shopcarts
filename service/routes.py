@@ -139,17 +139,38 @@ def list_all_shopcarts():
     arg_customer_id = request.args.get("customer_id")
 
     if arg_shopcart_id and arg_customer_id:
+        is_found = False
         for sc in shopcart.find_by_shopcart_id_and_customer_id(arg_shopcart_id, arg_customer_id):
+            is_found = True
             shopcarts["shopcarts"].append(sc.serialize())
             app.logger.info(f"Retrieved shopcarts with specific id: {shopcarts}")
+        if not is_found:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                "No Shopcart found."
+            )
     elif arg_shopcart_id:
+        is_found = False
         for sc in shopcart.find_by_shopcart_id(arg_shopcart_id):
+            is_found = True
             shopcarts["shopcarts"].append(sc.serialize())
             app.logger.info(f"Retrieved shopcarts with specific id: {shopcarts}")
+        if not is_found:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                "No Shopcart found."
+            )
     elif arg_customer_id:
+        is_found = False
         for sc in shopcart.find_by_customer_id(arg_customer_id):
+            is_found = True
             shopcarts["shopcarts"].append(sc.serialize())
             app.logger.info(f"Retrieved shopcarts with specific customer_id: {shopcarts}")
+        if not is_found:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                "No Shopcart found."
+            )
     else:
         for sc in shopcart.all():
             shopcarts["shopcarts"].append(sc.serialize())

@@ -341,6 +341,13 @@ class TestShopcartServer(TestCase):
             self.assertEqual(sc["id"], test_shopcart_id)
             self.assertEqual(sc["customer_id"], test_customer_id)
 
+        resp = self.client.get(
+            f"{BASE_URL}",
+            query_string=f"id={str(test_shopcart_id-1)}&customer_id={str(test_customer_id-1)}"
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_query_shopcarts_by_shopcart_id(self):
         """It should List all shopcarts with query shopcart_id"""
         shopcarts = self._create_shopcarts(5)
@@ -357,6 +364,13 @@ class TestShopcartServer(TestCase):
 
         for sc in data["shopcarts"]:
             self.assertEqual(sc["id"], test_shopcart_id)
+
+        resp = self.client.get(
+            f"{BASE_URL}",
+            query_string=f"id={str(test_shopcart_id-1)}"
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         
     def test_query_shopcarts_by_customer_id(self):
         """It should List all shopcarts with query customer_id"""
@@ -375,3 +389,9 @@ class TestShopcartServer(TestCase):
         for sc in data["shopcarts"]:
             self.assertEqual(sc["customer_id"], test_customer_id)
         
+        resp = self.client.get(
+            f"{BASE_URL}",
+            query_string=f"customer_id={str(test_customer_id-1)}"
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
