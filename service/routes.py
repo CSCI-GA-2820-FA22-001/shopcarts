@@ -283,6 +283,17 @@ def delete_an_item_from_shopcart(shopcart_id, item_id):
 
 
 ######################################################################
+# Health Endpoint for Kubernete
+######################################################################
+
+
+@app.route("/health", methods=["GET"])
+def check_health():
+    """ The health endpoint for Kubernete """
+    return jsonify(status="OK"), status.HTTP_200_OK
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 def init_db():
