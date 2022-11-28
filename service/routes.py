@@ -289,6 +289,59 @@ def delete_an_item_from_shopcart(shopcart_id, item_id):
 
 
 ######################################################################
+# UPDATE AN ITEM IN SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/items/<int:item_id>", methods=["PUT"])
+def update_item(shopcart_id, item_id):
+    """
+    Update an item{item_id} in a certain shopcart{shopcart_id}.
+    This endpoint will update an item based on the shopcart_id and item_id argument in the url
+    """
+    app.logger.info("Request to update an item")
+    check_content_type("application/json")
+
+    req = request.get_json()
+    if not "quantity" in req.keys() and not "price" in req.keys():
+        abort(status.HTTP_400_BAD_REQUEST, "Must have either quantity or price.")
+    quantity = None
+    price = None
+    if "quantity" in req.keys():
+        if not isinstance(req["quantity"], int) or req["quantity"] <= 0:
+            abort(status.HTTP_400_BAD_REQUEST, "Invalid quantity.")
+        else:
+            quantity = req["quantity"]
+    if "price" in req.keys():
+        if (not isinstance(req["price"], int)
+         and not isinstance(req["price"], float)) or req["price"] < 0:
+            abort(status.HTTP_400_BAD_REQUEST, "Invalid price.")
+        else:
+            price = req["price"]
+
+    # Make sure the shopcart exists
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(status.HTTP_404_NOT_FOUND, f"Shopcart with id {shopcart_id} was not found.")
+    item_index = -1
+    # Make sure the item exists
+    for i, item in enumerate(shopcart.items):
+        if item.id == item_id:
+            item_index = i
+            # Now proceed to update
+            if quantity:
+                item.quantity = quantity
+                app.logger.info(f"item {item_id}'s quantity is changed to {quantity}")
+            if price is not None and price >= 0:
+                item.price = price
+                app.logger.info(f"item {item_id}'s price is changed to {price}")
+            shopcart.update()
+            return shopcart.serialize(), status.HTTP_200_OK
+
+    if item_index == -1:
+        abort(status.HTTP_404_NOT_FOUND, f"item with id {item_id} was not found.")
+
+
+
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 def init_db():

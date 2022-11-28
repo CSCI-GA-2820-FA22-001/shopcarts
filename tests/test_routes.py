@@ -321,3 +321,63 @@ class TestShopcartServer(TestCase):
             f"{BASE_URL}/{shopcart_id}/items/{non_existing_item_id}"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_item(self):
+        """ It should update specified item."""
+        shopcart = self._create_shopcarts(1)[0]
+        item = self._create_items(1)[0]
+        item.shopcart_id = shopcart.id
+
+        # first create a shopcart
+        self.client.post(
+            f"{BASE_URL}/{shopcart.id}/items",
+             json=item.serialize(), content_type="application/json"
+        )
+
+        # check if valid change in quantity and price of an item is updated
+        req = item.serialize()
+        req["quantity"] = 12
+        req["price"] = 23
+        resp = self.client.put(f"{BASE_URL}/{shopcart.id}/items/{item.id}",
+         json=req, content_type="application/json"
+        )
+        item.deserialize(req)
+        shopcart.items.append(item)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.get_json(), shopcart.serialize())
+
+        # try to update a negative quantity value
+        req["quantity"] = -12
+        resp = self.client.put(f"{BASE_URL}/{shopcart.id}/items/{item.id}",
+         json=req, content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # try to update a negative price value
+        req["quantity"] = 12
+        req["price"] = -23
+        resp = self.client.put(f"{BASE_URL}/{shopcart.id}/items/{item.id}",
+         json=req, content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        # try to update a non existing shopcart
+        req["price"] = 23
+        resp = self.client.put(f"{BASE_URL}/{shopcart.id + randint(2,10)}/items/{item.id}",
+         json=req, content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # try to update a non existing item
+        resp = self.client.put(f"{BASE_URL}/{shopcart.id}/items/{item.id + randint(2,10)}",
+         json=req, content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # try to update with request json containing neither price nor quantity keys
+        req.pop("price")
+        req.pop("quantity")
+        resp = self.client.put(f"{BASE_URL}/{shopcart.id}/items/{item.id}",
+         json=req, content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
