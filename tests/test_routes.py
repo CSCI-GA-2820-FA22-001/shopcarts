@@ -176,11 +176,13 @@ class TestShopcartServer(TestCase):
         resp = self.client.delete(
             f"{BASE_URL}/{shopcart.id}"
         )
+
+        # delete a non-existing shopcart
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         resp = self.client.delete(
             f"{BASE_URL}/{shopcart.id}"
         )
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_list_all_shopcarts(self):
         """It should List all existing shopcarts."""

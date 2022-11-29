@@ -108,18 +108,14 @@ def delete_shopcart(shopcart_id):
     """
     Delete a single Shopcart.
     This endpoint deletes a shopcart with a specific shopcart ID.
-    If no such shopcart exists, return not found.
+    If no such shopcart exists, return HTTP_204_NO_CONTENT.
     """
     app.logger.info("Deleting Shopcart with id: %d", shopcart_id)
 
     shopcart = Shopcart.find(shopcart_id)
-    if not shopcart:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Shopcart with id '{shopcart_id}' could not be found."
-        )
+    if shopcart:
+        shopcart.delete()
 
-    shopcart.delete()
     return {}, status.HTTP_204_NO_CONTENT
 
 
