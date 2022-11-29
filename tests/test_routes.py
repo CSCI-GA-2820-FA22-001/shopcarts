@@ -5,6 +5,7 @@ Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
   coverage report -m
 """
+from cgitb import scanvars
 import os
 import logging
 from random import randint, sample
@@ -321,6 +322,81 @@ class TestShopcartServer(TestCase):
         resp = self.client.get(
             f"{BASE_URL}/{shopcart_id}/items/{non_existing_item_id}"
         )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_query_shopcarts_by_shopcart_id_and_customer_id(self):
+        """It should List all shopcarts with query shopcart_id_and_customer_id"""
+        shopcarts = self._create_shopcarts(5)
+        test_shopcart_id = shopcarts[0].id
+        test_customer_id = shopcarts[0].customer_id
+        shopcarts = [sc.serialize() for sc in shopcarts if sc.id == test_shopcart_id and sc.customer_id == test_customer_id]
+
+        resp = self.client.get(
+            f"{BASE_URL}",
+            query_string=f"id={str(test_shopcart_id)}&customer_id={str(test_customer_id)}"
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+
+        for sc in data["shopcarts"]:
+            self.assertEqual(sc["id"], test_shopcart_id)
+            self.assertEqual(sc["customer_id"], test_customer_id)
+
+        resp = self.client.get(
+            f"{BASE_URL}",
+            query_string=f"id={str(test_shopcart_id-1)}&customer_id={str(test_customer_id-1)}"
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_query_shopcarts_by_shopcart_id(self):
+        """It should List all shopcarts with query shopcart_id"""
+        shopcarts = self._create_shopcarts(5)
+        test_shopcart_id = shopcarts[0].id
+        shopcarts = [sc.serialize() for sc in shopcarts if sc.id == test_shopcart_id]
+
+        resp = self.client.get(
+            f"{BASE_URL}",
+            query_string=f"id={str(test_shopcart_id)}"
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+
+        for sc in data["shopcarts"]:
+            self.assertEqual(sc["id"], test_shopcart_id)
+
+        resp = self.client.get(
+            f"{BASE_URL}",
+            query_string=f"id={str(test_shopcart_id-1)}"
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        
+    def test_query_shopcarts_by_customer_id(self):
+        """It should List all shopcarts with query customer_id"""
+        shopcarts = self._create_shopcarts(5)
+        test_customer_id = shopcarts[0].customer_id
+        shopcarts = [sc.serialize() for sc in shopcarts if sc.customer_id == test_customer_id]
+
+        resp = self.client.get(
+            f"{BASE_URL}",
+            query_string=f"customer_id={str(test_customer_id)}"
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+
+        for sc in data["shopcarts"]:
+            self.assertEqual(sc["customer_id"], test_customer_id)
+        
+
+        resp = self.client.get(
+            f"{BASE_URL}",
+            query_string=f"customer_id={str(test_customer_id-1)}"
+        )
+
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_checkout_items(self):

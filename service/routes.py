@@ -6,7 +6,7 @@ Describe what your service does here
 
 from flask import jsonify, request, url_for, make_response, abort
 from .common import status  # HTTP Status Codes
-from service.models import Shopcart, Item, DataValidationError
+from service.models import Shopcart, Item
 
 # Import Flask application
 from . import app
@@ -130,9 +130,47 @@ def list_all_shopcarts():
     """
     shopcart = Shopcart()
     shopcarts = {"shopcarts": []}
-    for sc in shopcart.all():
-        shopcarts["shopcarts"].append(sc.serialize())
-    app.logger.info(f"Retrieved shopcarts: {shopcarts}")
+
+    arg_shopcart_id = request.args.get("id")
+    arg_customer_id = request.args.get("customer_id")
+
+    if arg_shopcart_id and arg_customer_id:
+        is_found = False
+        for sc in shopcart.find_by_shopcart_id_and_customer_id(arg_shopcart_id, arg_customer_id):
+            is_found = True
+            shopcarts["shopcarts"].append(sc.serialize())
+            app.logger.info(f"Retrieved shopcarts with specific id: {shopcarts}")
+        if not is_found:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                "No Shopcart found."
+            )
+    elif arg_shopcart_id:
+        is_found = False
+        for sc in shopcart.find_by_shopcart_id(arg_shopcart_id):
+            is_found = True
+            shopcarts["shopcarts"].append(sc.serialize())
+            app.logger.info(f"Retrieved shopcarts with specific id: {shopcarts}")
+        if not is_found:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                "No Shopcart found."
+            )
+    elif arg_customer_id:
+        is_found = False
+        for sc in shopcart.find_by_customer_id(arg_customer_id):
+            is_found = True
+            shopcarts["shopcarts"].append(sc.serialize())
+            app.logger.info(f"Retrieved shopcarts with specific customer_id: {shopcarts}")
+        if not is_found:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                "No Shopcart found."
+            )
+    else:
+        for sc in shopcart.all():
+            shopcarts["shopcarts"].append(sc.serialize())
+            app.logger.info(f"Retrieved shopcarts: {shopcarts}")
 
     return shopcarts, status.HTTP_200_OK
 
@@ -258,7 +296,7 @@ def add_an_item_to_shopcart(shopcart_id):
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
-#############################################################s#########
+######################################################################
 # DELETE AN ITEM FROM SHOPCART
 ######################################################################
 

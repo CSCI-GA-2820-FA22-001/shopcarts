@@ -123,16 +123,6 @@ class Item(db.Model, PersistentBase):
             )
         return self
 
-    @classmethod
-    def find_by_name(cls, name):
-        """Returns all YourResourceModels with the given name
-
-        Args:
-            name (string): the name of the YourResourceModels you want to match
-        """
-        logger.info("Processing name query for %s ...", name)
-        return cls.query.filter(cls.name == name)
-
 
 ######################################################################
 #  S H O P C A R T   M O D E L
@@ -180,3 +170,34 @@ class Shopcart(db.Model, PersistentBase):
                 "Error message: " + error.args[0]
             )
         return self
+
+    @classmethod
+    def find_by_shopcart_id_and_customer_id(cls, shopcart_id, customer_id):
+        """Returns all Shopcarts with the given shopcart_id and customer_id
+
+        Args:
+            shopcart_id (int): the id of the Shopcart you want to match
+            customer_id (int): the id of the Customer you want to match
+        """
+        logger.info("Processing shopcart_id_and_customer_id query for %s and %s ...", shopcart_id, customer_id)
+        return cls.query.filter(cls.id == shopcart_id, cls.customer_id == customer_id)
+
+    @classmethod
+    def find_by_shopcart_id(cls, shopcart_id):
+        """Returns all Shopcarts with the given shopcart_id
+
+        Args:
+            shopcart_id (int): the id of the Shopcart you want to match
+        """
+        logger.info("Processing id query for %s ...", id)
+        return cls.query.filter(cls.id == shopcart_id)
+
+    @classmethod
+    def find_by_customer_id(cls, customer_id):
+        """Returns all Shopcarts with the given customer_id
+
+        Args:
+            customer_id (int): the id of the Customer you want to match
+        """
+        logger.info("Processing customer_id query for %s ...", customer_id)
+        return cls.query.filter(cls.customer_id == customer_id)
