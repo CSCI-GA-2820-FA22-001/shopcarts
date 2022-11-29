@@ -8,7 +8,7 @@ Test cases can be run with the following:
 from cgitb import scanvars
 import os
 import logging
-from random import randint
+from random import randint, sample
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from tests.factories import ShopcartFactory, ItemFactory
@@ -177,11 +177,13 @@ class TestShopcartServer(TestCase):
         resp = self.client.delete(
             f"{BASE_URL}/{shopcart.id}"
         )
+
+        # delete a non-existing shopcart
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
         resp = self.client.delete(
             f"{BASE_URL}/{shopcart.id}"
         )
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_list_all_shopcarts(self):
         """It should List all existing shopcarts."""
@@ -389,9 +391,66 @@ class TestShopcartServer(TestCase):
         for sc in data["shopcarts"]:
             self.assertEqual(sc["customer_id"], test_customer_id)
         
+
         resp = self.client.get(
             f"{BASE_URL}",
             query_string=f"customer_id={str(test_customer_id-1)}"
         )
 
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_checkout_items(self):
+        """ It should return a list of items for checkout, and remove them from the shopcart"""
+        # Create a fictional shopcart and POST it
+        shopcart = self._create_shopcarts(1)[0]
+
+        # Create items and POST them to the shopcart
+        items = self._create_items(randint(5, 10))
+        for item in items:
+            resp = self.client.post(
+                f"{BASE_URL}/{shopcart.id}/items",
+                json=item.serialize(),
+                content_type="application/json"
+            )
+
+        # sample some of the items to be checked out
+        items_to_checkout = sample(items, randint(1, 5))
+
+        # prepare a dict to POST
+        checkout_dict = {"items": []}
+        for item in items_to_checkout:
+            checkout_dict["items"].append(item.serialize())
+
+        # try POSTing to a non-existing shopcart
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id + randint(42, 56)}/checkout",
+            json=checkout_dict,
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+        # try POSTing to a shopcart that does not have these items
+        other_shopcart = self._create_shopcarts(1)[0]
+        resp = self.client.post(
+            f"{BASE_URL}/{other_shopcart.id}/checkout",
+            json=checkout_dict,
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
+
+        # happy path
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/checkout",
+            json=checkout_dict,
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.get_json(), checkout_dict)
+
+        # try to checkout the same set of items again
+        resp = self.client.post(
+            f"{BASE_URL}/{shopcart.id}/checkout",
+            json=checkout_dict,
+            content_type="application/json"
+        )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

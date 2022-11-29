@@ -108,18 +108,14 @@ def delete_shopcart(shopcart_id):
     """
     Delete a single Shopcart.
     This endpoint deletes a shopcart with a specific shopcart ID.
-    If no such shopcart exists, return not found.
+    If no such shopcart exists, return HTTP_204_NO_CONTENT.
     """
     app.logger.info("Deleting Shopcart with id: %d", shopcart_id)
 
     shopcart = Shopcart.find(shopcart_id)
-    if not shopcart:
-        abort(
-            status.HTTP_404_NOT_FOUND,
-            f"Shopcart with id '{shopcart_id}' could not be found."
-        )
+    if shopcart:
+        shopcart.delete()
 
-    shopcart.delete()
     return {}, status.HTTP_204_NO_CONTENT
 
 
@@ -276,16 +272,22 @@ def add_an_item_to_shopcart(shopcart_id):
     app.logger.info(
         "Request to add an item to shopcart with id: %s", shopcart_id)
     check_content_type("application/json")
-    item = Item()
-    item.deserialize(request.get_json())
     shopcart = Shopcart.find(shopcart_id)
     if not shopcart:
         abort(
             status.HTTP_404_NOT_FOUND,
             f"Shopcart with id '{shopcart_id}' could not be found.",
         )
-    item.shopcart_id = shopcart_id
-    shopcart.items.append(item)
+    # temp_item is the data in request
+    temp_item = request.get_json()
+    item = Item.find(temp_item["id"])
+    if item:
+        item.quantity += temp_item["quantity"]
+    else:
+        item = Item()
+        temp_item["shopcart_id"] = shopcart_id
+        item.deserialize(temp_item)
+        shopcart.items.append(item)
     message = shopcart.serialize()
     location_url = url_for(
         "get_shopcarts", shopcart_id=shopcart.id, _external=True)
@@ -312,6 +314,56 @@ def delete_an_item_from_shopcart(shopcart_id, item_id):
         )
     item.delete()
     return {}, status.HTTP_204_NO_CONTENT
+
+
+######################################################################
+# Health Endpoint for Kubernete
+######################################################################
+
+
+@app.route("/health", methods=["GET"])
+def check_health():
+    """ The health endpoint for Kubernete """
+    return jsonify(status="OK"), status.HTTP_200_OK
+
+######################################################################
+# CHECKOUT ITEMS FROM A SHOPCART
+######################################################################
+@app.route("/shopcarts/<int:shopcart_id>/checkout", methods=["POST"])
+def checkout_items(shopcart_id):
+    """
+    Checkout selected items in a shopcart.
+    Returns JSON of a list of selected items; remove these items from shopcart.
+    Returns a 404 Error if any item is not in the item list of the shopcart.
+    Returns a 404 Error if the shopcart does not exist.
+    """
+    app.logger.info("Checking out items from Shopcart %d", shopcart_id)
+
+    shopcart = Shopcart.find(shopcart_id)
+    if not shopcart:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Shopcart with id '{shopcart_id}' could not be found."
+        )
+
+    items_to_checkout = request.get_json()["items"]
+    for item in items_to_checkout:
+        item_looked_up = Item.find(item["id"])
+        if not item_looked_up:
+            abort(
+                status.HTTP_404_NOT_FOUND,
+                f"item with id {item['id']} could not be found."
+            )
+        elif item_looked_up.shopcart_id != shopcart_id:
+            abort(
+                status.HTTP_403_FORBIDDEN,
+                f"item with id {item['id']} does not belong to shopcart"
+                + f" with id {shopcart_id}."
+            )
+        else:
+            item_looked_up.delete()
+
+    return request.get_json(), status.HTTP_200_OK
 
 
 ######################################################################
