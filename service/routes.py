@@ -139,7 +139,8 @@ def list_all_shopcarts():
         for sc in shopcart.find_by_shopcart_id_and_customer_id(arg_shopcart_id, arg_customer_id):
             is_found = True
             shopcarts["shopcarts"].append(sc.serialize())
-            app.logger.info(f"Retrieved shopcarts with specific id: {shopcarts}")
+            app.logger.info(
+                f"Retrieved shopcarts with specific id: {shopcarts}")
         if not is_found:
             abort(
                 status.HTTP_404_NOT_FOUND,
@@ -150,7 +151,8 @@ def list_all_shopcarts():
         for sc in shopcart.find_by_shopcart_id(arg_shopcart_id):
             is_found = True
             shopcarts["shopcarts"].append(sc.serialize())
-            app.logger.info(f"Retrieved shopcarts with specific id: {shopcarts}")
+            app.logger.info(
+                f"Retrieved shopcarts with specific id: {shopcarts}")
         if not is_found:
             abort(
                 status.HTTP_404_NOT_FOUND,
@@ -161,7 +163,8 @@ def list_all_shopcarts():
         for sc in shopcart.find_by_customer_id(arg_customer_id):
             is_found = True
             shopcarts["shopcarts"].append(sc.serialize())
-            app.logger.info(f"Retrieved shopcarts with specific customer_id: {shopcarts}")
+            app.logger.info(
+                f"Retrieved shopcarts with specific customer_id: {shopcarts}")
         if not is_found:
             abort(
                 status.HTTP_404_NOT_FOUND,
@@ -330,7 +333,8 @@ def update_item(shopcart_id, item_id):
 
     req = request.get_json()
     if not "quantity" in req.keys() and not "price" in req.keys():
-        abort(status.HTTP_400_BAD_REQUEST, "Must have either quantity or price.")
+        abort(status.HTTP_400_BAD_REQUEST,
+              "Must have either quantity or price.")
     quantity = None
     price = None
     if "quantity" in req.keys():
@@ -340,7 +344,7 @@ def update_item(shopcart_id, item_id):
             quantity = req["quantity"]
     if "price" in req.keys():
         if (not isinstance(req["price"], int)
-         and not isinstance(req["price"], float)) or req["price"] < 0:
+                and not isinstance(req["price"], float)) or req["price"] < 0:
             abort(status.HTTP_400_BAD_REQUEST, "Invalid price.")
         else:
             price = req["price"]
@@ -348,7 +352,8 @@ def update_item(shopcart_id, item_id):
     # Make sure the shopcart exists
     shopcart = Shopcart.find(shopcart_id)
     if not shopcart:
-        abort(status.HTTP_404_NOT_FOUND, f"Shopcart with id {shopcart_id} was not found.")
+        abort(status.HTTP_404_NOT_FOUND,
+              f"Shopcart with id {shopcart_id} was not found.")
     item_index = -1
     # Make sure the item exists
     for i, item in enumerate(shopcart.items):
@@ -357,16 +362,20 @@ def update_item(shopcart_id, item_id):
             # Now proceed to update
             if quantity:
                 item.quantity = quantity
-                app.logger.info(f"item {item_id}'s quantity is changed to {quantity}")
+                app.logger.info(
+                    f"item {item_id}'s quantity is changed to {quantity}")
             if price is not None and price >= 0:
                 item.price = price
-                app.logger.info(f"item {item_id}'s price is changed to {price}")
+                app.logger.info(
+                    f"item {item_id}'s price is changed to {price}")
             shopcart.update()
             return shopcart.serialize(), status.HTTP_200_OK
 
     if item_index == -1:
-        abort(status.HTTP_404_NOT_FOUND, f"item with id {item_id} was not found.")
+        abort(status.HTTP_404_NOT_FOUND,
+              f"item with id {item_id} was not found.")
 
+######################################################################
 # Health Endpoint for Kubernete
 ######################################################################
 
@@ -379,6 +388,8 @@ def check_health():
 ######################################################################
 # CHECKOUT ITEMS FROM A SHOPCART
 ######################################################################
+
+
 @app.route("/shopcarts/<int:shopcart_id>/checkout", methods=["POST"])
 def checkout_items(shopcart_id):
     """
