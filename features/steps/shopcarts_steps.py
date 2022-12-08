@@ -54,8 +54,6 @@ def step_impl(context):
         row_lst = [json.loads(row['items'].replace("'", '"'))]
         for item in row_lst:
             payload_item = item[0]
-            print(payload_item)
-            print(type(payload_item))
             context.resp = requests.post(
                 rest_endpoint+"/"+str(shopcarts_id[i])+"/items", json=payload_item)
             expect(context.resp.status_code).to_equal(201)

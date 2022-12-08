@@ -114,6 +114,8 @@ def delete_shopcart(shopcart_id):
 
     shopcart = Shopcart.find(shopcart_id)
     if shopcart:
+        for item in shopcart.items:
+            item.delete()
         shopcart.delete()
 
     return {}, status.HTTP_204_NO_CONTENT
