@@ -176,7 +176,7 @@ $(function () {
         let queryString = ""
 
         if (shopcart_id) {
-            queryString += 'shopcart_id=' + shopcart_id
+            queryString += 'id=' + shopcart_id
         }
         if (customer_id) {
             if (queryString.length > 0) {
@@ -204,6 +204,7 @@ $(function () {
             table += '<th class="col-md-2">Customer ID</th>'
             table += '</tr></thead><tbody>'
             let firstShopcart = "";
+            res = res.shopcarts;
             for(let i = 0; i < res.length; i++) {
                 let shopcart = res[i];
                 table +=  `<tr id="row_${i}"><td>${shopcart.id}</td><td>${shopcart.customer_id}</td></tr>`;
