@@ -7,24 +7,14 @@ $(function () {
     // Updates the form with data from the response
     function update_form_data(res) {
         $("#shopcart_id").val(res.id);
-        $("#shopcart_name").val(res.name);
-        $("#shopcart_category").val(res.category);
-        if (res.available == true) {
-            $("#shopcart_available").val("true");
-        } else {
-            $("#shopcart_available").val("false");
-        }
-        $("#shopcart_gender").val(res.gender);
-        $("#shopcart_birthday").val(res.birthday);
+        $("#customer_id").val(res.customer_id);
+        $("#items").val(res.items);
     }
 
     /// Clears all form fields
     function clear_form_data() {
-        $("#shopcart_name").val("");
-        $("#shopcart_category").val("");
-        $("#shopcart_available").val("");
-        $("#shopcart_gender").val("");
-        $("#shopcart_birthday").val("");
+        $("#customer_id").val("");
+        $("#items").val("");
     }
 
     // Updates the flash message area
@@ -34,23 +24,18 @@ $(function () {
     }
 
     // ****************************************
-    // Create a Pet
+    // Create a Shopcart
     // ****************************************
 
     $("#create-btn").click(function () {
 
-        let name = $("#shopcart_name").val();
-        let category = $("#shopcart_category").val();
-        let available = $("#shopcart_available").val() == "true";
-        let gender = $("#shopcart_gender").val();
-        let birthday = $("#shopcart_birthday").val();
+        let customer_id = $("#customer_id").val();
+        let items = $("#items").val();
+
 
         let data = {
-            "name": name,
-            "category": category,
-            "available": available,
-            "gender": gender,
-            "birthday": birthday
+            "customer_id": customer_id,
+            "items" : items
         };
 
         $("#flash_message").empty();
@@ -74,24 +59,19 @@ $(function () {
 
 
     // ****************************************
-    // Update a Pet
+    // Update a Shopcart
     // ****************************************
 
     $("#update-btn").click(function () {
 
         let shopcart_id = $("#shopcart_id").val();
-        let name = $("#shopcart_name").val();
-        let category = $("#shopcart_category").val();
-        let available = $("#shopcart_available").val() == "true";
-        let gender = $("#shopcart_gender").val();
-        let birthday = $("#shopcart_birthday").val();
+        let customer_id = $("#customer_id").val();
+        let items = $("#items").val();
+
 
         let data = {
-            "name": name,
-            "category": category,
-            "available": available,
-            "gender": gender,
-            "birthday": birthday
+            "customer_id": customer_id,
+            "items" : items
         };
 
         $("#flash_message").empty();
@@ -115,7 +95,7 @@ $(function () {
     });
 
     // ****************************************
-    // Retrieve a Pet
+    // Retrieve a Shopcart
     // ****************************************
 
     $("#retrieve-btn").click(function () {
@@ -145,7 +125,7 @@ $(function () {
     });
 
     // ****************************************
-    // Delete a Pet
+    // Delete a Shopcart
     // ****************************************
 
     $("#delete-btn").click(function () {
@@ -163,7 +143,7 @@ $(function () {
 
         ajax.done(function(res){
             clear_form_data()
-            flash_message("Pet has been Deleted!")
+            flash_message("Shopcart has been Deleted!")
         });
 
         ajax.fail(function(res){
@@ -182,32 +162,27 @@ $(function () {
     });
 
     // ****************************************
-    // Search for a Pet
+    // Search for a Shopcart
     // ****************************************
 
+    //
+    // TODO(pintsung): update this!
+    //
     $("#search-btn").click(function () {
 
-        let name = $("#shopcart_name").val();
-        let category = $("#shopcart_category").val();
-        let available = $("#shopcart_available").val() == "true";
+        let shopcart_id = $("#shopcart_id").val();
+        let customer_id = $("#customer_id").val();
 
         let queryString = ""
 
-        if (name) {
-            queryString += 'name=' + name
+        if (shopcart_id) {
+            queryString += 'shopcart_id=' + shopcart_id
         }
-        if (category) {
+        if (customer_id) {
             if (queryString.length > 0) {
-                queryString += '&category=' + category
+                queryString += '&customer_id=' + customer_id
             } else {
-                queryString += 'category=' + category
-            }
-        }
-        if (available) {
-            if (queryString.length > 0) {
-                queryString += '&available=' + available
-            } else {
-                queryString += 'available=' + available
+                queryString += 'customer_id=' + customer_id
             }
         }
 
@@ -226,26 +201,22 @@ $(function () {
             let table = '<table class="table table-striped" cellpadding="10">'
             table += '<thead><tr>'
             table += '<th class="col-md-2">ID</th>'
-            table += '<th class="col-md-2">Name</th>'
-            table += '<th class="col-md-2">Category</th>'
-            table += '<th class="col-md-2">Available</th>'
-            table += '<th class="col-md-2">Gender</th>'
-            table += '<th class="col-md-2">Birthday</th>'
+            table += '<th class="col-md-2">Customer ID</th>'
             table += '</tr></thead><tbody>'
-            let firstPet = "";
+            let firstShopcart = "";
             for(let i = 0; i < res.length; i++) {
-                let pet = res[i];
-                table +=  `<tr id="row_${i}"><td>${pet.id}</td><td>${pet.name}</td><td>${pet.category}</td><td>${pet.available}</td><td>${pet.gender}</td><td>${pet.birthday}</td></tr>`;
+                let shopcart = res[i];
+                table +=  `<tr id="row_${i}"><td>${shopcart.id}</td><td>${shopcart.customer_id}</td></tr>`;
                 if (i == 0) {
-                    firstPet = pet;
+                    firstShopcart = shopcart;
                 }
             }
             table += '</tbody></table>';
             $("#search_results").append(table);
 
             // copy the first result to the form
-            if (firstPet != "") {
-                update_form_data(firstPet)
+            if (firstShopcart != "") {
+                update_form_data(firstShopcart)
             }
 
             flash_message("Success")
