@@ -97,7 +97,9 @@ Feature: The shopcart service back-end
         Then I should see the message "Success"
         When I copy the "Shopcart ID" field
         And I press the "Clear Form" button
-        And I paste the "Shopcart ID" field
+        Then the "Shopcart ID" field should be empty
+        And the "Customer ID" field should be empty
+        When I paste the "Shopcart ID" field
         And I press the "Delete Shopcart" button
         Then I should see the message "Successfully cleared the shopcart"
         When I press the "List All Shopcarts" button
@@ -111,7 +113,9 @@ Feature: The shopcart service back-end
         Then I should see the message "Success"
         When I copy the "Shopcart ID" field
         And I press the "Clear Form" button
-        And I paste the "Shopcart ID" field
+        Then the "Shopcart ID" field should be empty
+        And the "Customer ID" field should be empty
+        When I paste the "Shopcart ID" field
         And I set the "Item ID" to "8"
         And I set the "Item Name" to "Banana"
         And I set the "Quantity" to "5"
@@ -134,14 +138,56 @@ Feature: The shopcart service back-end
         And I should see "price: 2.99" in the shopcart results
         And I should see "quantity: 5" in the shopcart results
 
-#Scenario: Delete an Item from a Shopcart
-#    When I visit the "home page"
-#    And I set the "shopcart_id" to "1"
-#    # not there yet
-#    And I press the "checkout" button
-#    Then I should see the message "Success"
-#    # not done yet
+    Scenario: Delete an Item from a Shopcart
+        When I visit the "home page"
+        And I set the "Customer ID" to "10"
+        And I press the "Search Shopcart" button
+        Then I should see the message "Success"
+        When I copy the "Shopcart ID" field
+        And I press the "Clear Form" button
+        Then the "Shopcart ID" field should be empty
+        And the "Customer ID" field should be empty
+        When I paste the "Shopcart ID" field
+        And I set the "Item ID" to "5"
+        And I press the "Delete Item" button
+        Then I should see the message "Success"
+        When I set the "Customer ID" to "10"
+        And I press the "Search Shopcart" button
+        Then I should see the message "Success"
+        And I should not see "color: silver" in the shopcart results
+        And I should not see "id: 5" in the shopcart results
+        And I should not see "name: MacBook" in the shopcart results
+        And I should not see "price: 1000" in the shopcart results
+        And I should not see "quantity: 1" in the shopcart results
 
+    Scenario: Update an Item from a Shopcart
+        When I visit the "home page"
+        And I set the "Customer ID" to "10"
+        And I press the "Search Shopcart" button
+        Then I should see the message "Success"
+        When I copy the "Shopcart ID" field
+        And I press the "Clear Form" button
+        Then the "Shopcart ID" field should be empty
+        And the "Customer ID" field should be empty
+        When I paste the "Shopcart ID" field
+        And I set the "Item ID" to "5"
+        And I set the "Quantity" to "2"
+        And I set the "Color" to "Grey"
+        And I set the "Price" to "2000"
+        And I press the "Update Item" button
+        Then I should see the message "Success"
+        When I set the "Customer ID" to "10"
+        And I press the "Search Shopcart" button
+        Then I should see the message "Success"
+        And I should see "color: Grey" in the shopcart results
+        And I should see "price: 2000" in the shopcart results
+        And I should see "quantity: 2" in the shopcart results
+        And I should not see "color: silver" in the shopcart results
+        And I should not see "price: 1000" in the shopcart results
+        And I should not see "quantity: 1" in the shopcart results
+
+
+# not done yet
 #Scenario: Update a Shopcart
 #    When I visit the "home page"
 #    And I set the "shopcart_id" to "2"

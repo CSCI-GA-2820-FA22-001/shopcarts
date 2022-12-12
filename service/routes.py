@@ -327,11 +327,12 @@ def update_item(shopcart_id, item_id):
     check_content_type("application/json")
 
     req = request.get_json()
-    if not "quantity" in req.keys() and not "price" in req.keys():
+    if not "quantity" in req.keys() and not "price" in req.keys() and not "color" in req.keys():
         abort(status.HTTP_400_BAD_REQUEST,
-              "Must have either quantity or price.")
+              "Must have either quantity or price or color.")
     quantity = None
     price = None
+    color = None
     if "quantity" in req.keys():
         if not isinstance(req["quantity"], int) or req["quantity"] <= 0:
             abort(status.HTTP_400_BAD_REQUEST, "Invalid quantity.")
@@ -343,6 +344,11 @@ def update_item(shopcart_id, item_id):
             abort(status.HTTP_400_BAD_REQUEST, "Invalid price.")
         else:
             price = req["price"]
+    if "color" in req.keys():
+        if not isinstance(req["color"], str) or req["color"] == "":
+            abort(status.HTTP_400_BAD_REQUEST, "Invalid color.")
+        else:
+            color = req["color"]
 
     # Make sure the shopcart exists
     shopcart = Shopcart.find(shopcart_id)
@@ -363,6 +369,10 @@ def update_item(shopcart_id, item_id):
                 item.price = price
                 app.logger.info(
                     f"item {item_id}'s price is changed to {price}")
+            if color:
+                item.color = color
+                app.logger.info(
+                    f"item {item_id}'s color is changed to {color}")
             shopcart.update()
             return shopcart.serialize(), status.HTTP_200_OK
 

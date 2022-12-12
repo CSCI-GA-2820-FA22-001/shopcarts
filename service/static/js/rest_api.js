@@ -184,6 +184,7 @@ $(function () {
         let item_id = parseInt($("#item_id").val());
         let quantity = parseInt($("#quantity").val());
         let price = parseFloat($("#price").val());
+        let color = parseFloat($("#color").val());
 
         // alert($("#price").val())
         let data = {};
@@ -205,6 +206,12 @@ $(function () {
         else if ($("#price").val() != "") {
             data["price"] = $("#price").val()
         }
+        if (!isNaN(color)) {
+            data["color"] = color;
+        }
+        else if ($("#color").val() != "") {
+            data["color"] = $("#color").val()
+        }
         // alert(data["price"])
         $("#flash_message").empty();
 
@@ -222,15 +229,13 @@ $(function () {
             table += '<th class="col-md-2">Item ID</th>'
             table += '<th class="col-md-2">Quantity</th>'
             table += '<th class="col-md-2">Price</th>'
+            table += '<th class="col-md-2">Color</th>'
             table += '<th class="col-md-2">Shopcart_ID</th>'
             table += '</tr></thead><tbody>'
-
             let item = res;
-            table += `<tr><td>${item_id}</td><td>${data["quantity"]}</td><td>${data["price"]}</td><td>${shopcart_id}</td></tr>`;
+            table += `<tr><td>${item_id}</td><td>${data["quantity"]}</td><td>${data["price"]}</td><td>${data["color"]}</td><td>${shopcart_id}</td></tr>`;
             table += '</tbody></table>';
-
             $("#search_results").append(table);
-
             clear_form_data()
             $("#shopcarts_results").empty();
             flash_message(`Successfully updated the item`)
@@ -358,7 +363,7 @@ $(function () {
     // Delete an Item
     // ****************************************
 
-    $("#remove-btn").click(function () {
+    $("#delete-item-btn").click(function () {
 
         let shopcart_id = parseInt($("#shopcart_id").val());
         let item_id = parseInt($("#item_id").val());
