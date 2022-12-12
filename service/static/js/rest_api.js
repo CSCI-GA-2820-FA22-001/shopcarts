@@ -75,7 +75,7 @@ $(function () {
 
     $("#add-to-shopcart-btn").click(function () {
 
-        let shopcart_id = parseInt($("#customer_id").val());
+        let shopcart_id = parseInt($("#shopcart_id").val());
         let id = parseInt($("#item_id").val());
         let name = $("#item_name").val();
         let quantity = parseInt($("#quantity").val());
