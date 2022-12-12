@@ -12,6 +12,7 @@ $(function () {
         $("#item_name").val(res.item_name);
         $("#quantity").val(res.quantity);
         $("#price").val(res.price);
+        $("#color").val(res.color);
     }
 
     /// Clears all form fields
@@ -22,6 +23,7 @@ $(function () {
         $("#item_name").val("");
         $("#quantity").val("");
         $("#price").val("");
+        $("#color").val(""); 
     }
 
     // Updates the flash message area
@@ -80,6 +82,7 @@ $(function () {
         let name = $("#item_name").val();
         let quantity = parseInt($("#quantity").val());
         let price = parseFloat($("#price").val());
+        let color = $("#color").val();
 
         let data = {
             "id": id,
@@ -87,7 +90,7 @@ $(function () {
             "name": name,
             "quantity": quantity,
             "price": price,
-            "color": "blue"
+            "color": color
         };
 
         $("#flash_message").empty();
@@ -139,11 +142,12 @@ $(function () {
             table += '<th class="col-md-2">Item Name</th>'
             table += '<th class="col-md-2">Quantity</th>'
             table += '<th class="col-md-2">Price</th>'
+            table += '<th class="col-md-2">Color</th>'
             table += '<th class="col-md-2">Shopcart_ID</th>'
             table += '</tr></thead><tbody>'
 
             let item = res;
-            table += `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.quantity}</td><td>${item.price}</td><td>${item.shopcart_id}</td></tr>`;
+            table += `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.quantity}</td><td>${item.price}</td><td>${item.color}</td><td>${item.shopcart_id}</td></tr>`;
             table += '</tbody></table>';
 
             $("#search_results").append(table);
