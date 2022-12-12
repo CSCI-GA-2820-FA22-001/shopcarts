@@ -12,13 +12,35 @@ Feature: The shopcart service back-end
 
     Scenario: The server is running
         When I visit the "home page"
-        Then I should see "Shopcart REST API Service available at /shopcarts" in the title
+        Then I should see "Shopcart RESTful Service" in the title
         And I should not see "404 Not Found"
+
+    Scenario: Create a Shopcart
+        When I visit the "home page"
+        And I set the "customer_id" to "5566"
+        And I set the "item_id" to "40"
+        And I set the "item_name" to "Banana"
+        And I set the "quantity" to "1"
+        And I set the "price" to "0.5"
+        And I set the "color" to "green"
+        And I press the "create-shopcart-btn" button
+        Then I should see the message "Success"
+        When I copy the "shopcart_id" field
+        And I press the "clear-btn" button
+        Then the "shopcart_id" field should be empty
+        And the "item_id" field should be empty
+        And the "item_name" field should be empty
+        And the "quantity" field should be empty
+        And the "price" field should be empty
+        And the "color" field should be empty
+        When I paste the "ID" field
+
+        And I should see "4" in the "shopcart_id" field
 
     Scenario: List all Shopcarts
         When I visit the "home page"
         # not there yet
-        And I press the "list" button
+        And I press the "List All Shopcarts" button
         Then I should see the message "Success"
         And I should see "1" in the results
         And I should see "2" in the results
@@ -37,14 +59,9 @@ Feature: The shopcart service back-end
         # not there yet
         And I press the "checkout" button
         Then I should see the message "Success"
-        # not done yet
+    # not done yet
 
-    Scenario: Create a Shopcart
-        When I visit the "home page"
-        And I set the "customer_id" to "5566"
-        And I press the "create" button
-        Then I should see the message "Success"
-        And I should see "4" in the "shopcart_id" field
+
 
     Scenario: Retrieve a Shopcart
         When I visit the "home page"
@@ -52,7 +69,7 @@ Feature: The shopcart service back-end
         And I press the "retrieve" button
         Then I should see the message "Success"
         And I should see "10" in the "customer_id" field
-        # And I should see "[{'id':5, 'name':'MacBook', 'price':1000, 'quantity':1, 'color':'silver'}]" in "items"
+    # And I should see "[{'id':5, 'name':'MacBook', 'price':1000, 'quantity':1, 'color':'silver'}]" in "items"
 
     Scenario: Update a Shopcart
         When I visit the "home page"
