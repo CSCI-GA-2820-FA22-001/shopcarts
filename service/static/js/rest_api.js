@@ -6,15 +6,22 @@ $(function () {
 
     // Updates the form with data from the response
     function update_form_data(res) {
-        $("#shopcart_id").val(res.id);
         $("#customer_id").val(res.customer_id);
-        $("#items").val(res.items);
+        $("#shopcart_id").val(res.shopcart_id);
+        $("#item_id").val(res.item_id);
+        $("#item_name").val(res.item_name);
+        $("#quantity").val(res.quantity);
+        $("#price").val(res.price);
     }
 
     /// Clears all form fields
     function clear_form_data() {
         $("#customer_id").val("");
-        $("#items").val("");
+        $("#shopcart_id").val("");
+        $("#item_id").val("");
+        $("#item_name").val("");
+        $("#quantity").val("");
+        $("#price").val("");
     }
 
     // Updates the flash message area
@@ -23,33 +30,31 @@ $(function () {
         $("#flash_message").append(message);
     }
 
+
     // ****************************************
-    // Create a Shopcart
+    // Create Empty Shopcart
     // ****************************************
 
-    $("#create-btn").click(function () {
-
-        let customer_id = $("#customer_id").val();
-        let items = $("#items").val();
-
+    $("#create-shopcart-btn").click(function () {
+        
+        let customer_id = Number($("#customer_id").val());
 
         let data = {
             "customer_id": customer_id,
-            "items" : items
+            "items": []
         };
 
         $("#flash_message").empty();
         
         let ajax = $.ajax({
             type: "POST",
-            url: "/shopcarts",
+            url: `/shopcarts`,
             contentType: "application/json",
             data: JSON.stringify(data),
         });
 
         ajax.done(function(res){
-            update_form_data(res)
-            flash_message("Success")
+            flash_message("Successfully added an empty shopcart")
         });
 
         ajax.fail(function(res){
@@ -59,33 +64,145 @@ $(function () {
 
 
     // ****************************************
-    // Update a Shopcart
+    // Create Item
     // ****************************************
 
-    $("#update-btn").click(function () {
+    $("#add-to-shopcart-btn").click(function () {
 
-        let shopcart_id = $("#shopcart_id").val();
-        let customer_id = $("#customer_id").val();
-        let items = $("#items").val();
-
+        let shopcart_id = parseInt($("#customer_id").val());
+        let id = parseInt($("#item_id").val());
+        let name = $("#item_name").val();
+        let quantity = parseInt($("#quantity").val());
+        let price = parseFloat($("#price").val());
 
         let data = {
-            "customer_id": customer_id,
-            "items" : items
+            "id": id,
+            "shopcart_id": shopcart_id,
+            "name": name,
+            "quantity": quantity,
+            "price": price,
+            "color": "blue"
         };
+
+        $("#flash_message").empty();
+        
+        let ajax = $.ajax({
+            type: "POST",
+            url: `/shopcarts/${shopcart_id}/items`,
+            contentType: "application/json",
+            data: JSON.stringify(data),
+        });
+
+        ajax.done(function(res){
+            flash_message("Successfully added an Item")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+    });
+
+    // ****************************************
+    // Retrieve Item
+    // ****************************************
+    $("#get-item-btn").click(function (){
+        let shopcart_id = parseInt($("#shopcart_id").val());
+        let item_id = parseInt($("#item_id").val());
 
         $("#flash_message").empty();
 
         let ajax = $.ajax({
+            type: "GET",
+            url: `/shopcarts/${shopcart_id}/items/${item_id}`,
+            contentType: "application/json",
+            data: ''
+        });
+
+        ajax.done(function(res){
+            //alert(res.toSource())
+            $("#search_results").empty();
+            let table = '<table class="table table-striped" cellpadding="10">'
+            table += '<thead><tr>'
+            table += '<th class="col-md-2">Item ID</th>'
+            table += '<th class="col-md-2">Item Name</th>'
+            table += '<th class="col-md-2">Quantity</th>'
+            table += '<th class="col-md-2">Price</th>'
+            table += '<th class="col-md-2">Shopcart_ID</th>'
+            table += '</tr></thead><tbody>'
+
+            let item = res;
+            table += `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.quantity}</td><td>${item.price}</td><td>${item.shopcart_id}</td></tr>`;
+            table += '</tbody></table>';
+            $("#search_results").append(table);
+            flash_message("Successfully retrieved the item")
+        });
+
+        ajax.fail(function(res){
+            clear_form_data()
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+
+
+    // ****************************************
+    // Update Item
+    // ****************************************
+
+    $("#update-item-btn").click(function () {
+
+        let shopcart_id = parseInt($("#shopcart_id").val());
+        let item_id = parseInt($("#item_id").val());
+        let quantity = parseInt($("#quantity").val());
+        let price = parseFloat($("#price").val());
+        
+        // alert($("#price").val())
+        let data = {};
+        if ($("#quantity").val() == "0") {
+            data["quantity"] = 0;
+        }
+        else if (!isNaN(quantity)) {
+            data["quantity"] = quantity;
+        }
+        else if ($("#quantity").val() != "") {
+            data["quantity"] = $("#quantity").val()
+        }
+        if ($("#price").val() == "0") {
+            data["price"] = 0.0;
+        }
+        else if (!isNaN(price)) {
+            data["price"] = price;
+        }
+        else if($("#price").val() != "") {
+            data["price"] = $("#price").val()
+        }
+        // alert(data["price"])
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
                 type: "PUT",
-                url: `/shopcarts/${shopcart_id}`,
+                url: `/shopcarts/${shopcart_id}/items/${item_id}`,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })
 
         ajax.done(function(res){
-            update_form_data(res)
-            flash_message("Success")
+            $("#search_results").empty();
+            let table = '<table class="table table-striped" cellpadding="10">'
+            table += '<thead><tr>'
+            table += '<th class="col-md-2">Item ID</th>'
+            table += '<th class="col-md-2">Item Name</th>'
+            table += '<th class="col-md-2">Quantity</th>'
+            table += '<th class="col-md-2">Price</th>'
+            table += '<th class="col-md-2">Shopcart_ID</th>'
+            table += '</tr></thead><tbody>'
+
+            let item = res;
+            table += `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.quantity}</td><td>${item.price}</td><td>${item.shopcart_id}</td></tr>`;
+            table += '</tbody></table>';
+            $("#search_results").append(table);
+            flash_message(`Successfully updated the item`)
         });
 
         ajax.fail(function(res){
@@ -95,12 +212,12 @@ $(function () {
     });
 
     // ****************************************
-    // Retrieve a Shopcart
+    // Retrieve Shopcart
     // ****************************************
 
     $("#retrieve-btn").click(function () {
 
-        let shopcart_id = $("#shopcart_id").val();
+        let shopcart_id = Number($("#shopcart_id").val());
 
         $("#flash_message").empty();
 
@@ -113,8 +230,18 @@ $(function () {
 
         ajax.done(function(res){
             //alert(res.toSource())
-            update_form_data(res)
-            flash_message("Success")
+            $("#shopcarts_results").empty();
+            let table = '<table class="table table-striped" cellpadding="10">'
+            table += '<thead><tr>'
+            table += '<th class="col-md-5">Shopcart ID</th>'
+            table += '</tr></thead><tbody class="scrollTbody">'
+
+            table +=  `<tr><td>${JSON.stringify(res['items'][0])}</td><td>${res.customer_id}</td><td>${res.id}</td></tr>`;
+
+            table += '</tbody></table>';
+            $("#shopcarts_results").append(table);
+
+            flash_message("Successfully retrieved the shopcart")
         });
 
         ajax.fail(function(res){
@@ -123,52 +250,102 @@ $(function () {
         });
 
     });
-
     // ****************************************
-    // Delete a Shopcart
+    // List All Shopcarts
+    // ****************************************
+    $("#list-all-shopcarts-btn").click(function () {
+
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "GET",
+            url: `/shopcarts`,
+            // contentType: "application/json",
+            data: ''
+        })
+        ajax.done(function(res){
+            $("#shopcarts_results").empty();
+            let table = '<table class="table table-striped" cellpadding="10">'
+            table += '<thead><tr>'
+            table += '<th class="col-md-5">Shopcart ID</th>'
+            table += '</tr></thead><tbody class="scrollTbody">'
+
+            for(let i = 0; i < res['shopcarts'].length; i++) {
+                table +=  `<tr id="row_${i}"><td>${JSON.stringify(res['shopcarts'][i]['items'][0])}</td><td>${res['shopcarts'][i].customer_id}</td><td>${res['shopcarts'][i].id}</td></tr>`;
+            }
+            if(res['shopcarts'].length == 0){
+                table +=  `<tr><td>No shopcarts in database</td></tr>`;
+            }
+            table += '</tbody></table>';
+            $("#shopcarts_results").append(table);
+
+            flash_message("Successfully listed all the shopcarts")
+        });
+
+        ajax.fail(function(res){
+            clear_form_data()
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+    // ****************************************
+    // Delete an Item
     // ****************************************
 
-    $("#delete-btn").click(function () {
+    $("#remove-btn").click(function () {
 
-        let shopcart_id = $("#shopcart_id").val();
+        let shopcart_id = parseInt($("#shopcart_id").val());
+        let item_id = parseInt($("#item_id").val());
 
         $("#flash_message").empty();
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/shopcarts/${shopcart_id}`,
+            url: `/shopcarts/${shopcart_id}/items/${item_id}`,
             contentType: "application/json",
-            data: '',
-        })
+            data: ''
+        });
 
         ajax.done(function(res){
             clear_form_data()
-            flash_message("Shopcart has been Deleted!")
+            flash_message("Successfully deleted an item")
         });
 
         ajax.fail(function(res){
-            flash_message("Server error!")
+            clear_form_data()
+            flash_message("Successfully deleted an item")
         });
     });
 
     // ****************************************
-    // Clear the form
+    // Clear Shopcart
     // ****************************************
+    $("#clear-shopcart-btn").click(function() {
 
-    $("#clear-btn").click(function () {
-        $("#shopcart_id").val("");
+        let shopcart_id = Number($("#shopcart_id").val());
+
         $("#flash_message").empty();
-        clear_form_data()
+        
+        let ajax = $.ajax({
+            type: "DELETE",
+            url: `/shopcarts/${shopcart_id}`,
+            contentType: "application/json",
+        });
+
+        ajax.done(function(res){
+            flash_message("Successfully cleared the shopcart" )
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
     });
 
-    // ****************************************
+    
+     // ****************************************
     // Search for a Shopcart
     // ****************************************
-
-    //
-    // TODO(pintsung): update this!
-    //
-    $("#search-btn").click(function () {
+    $("#search-shopcarts-btn").click(function () {
 
         let shopcart_id = $("#shopcart_id").val();
         let customer_id = $("#customer_id").val();
@@ -191,42 +368,44 @@ $(function () {
         let ajax = $.ajax({
             type: "GET",
             url: `/shopcarts?${queryString}`,
-            contentType: "application/json",
+            //contentType: "application/json",
             data: ''
         })
 
         ajax.done(function(res){
             //alert(res.toSource())
-            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             let table = '<table class="table table-striped" cellpadding="10">'
             table += '<thead><tr>'
-            table += '<th class="col-md-2">ID</th>'
-            table += '<th class="col-md-2">Customer ID</th>'
-            table += '</tr></thead><tbody>'
-            let firstShopcart = "";
-            res = res.shopcarts;
-            for(let i = 0; i < res.length; i++) {
-                let shopcart = res[i];
-                table +=  `<tr id="row_${i}"><td>${shopcart.id}</td><td>${shopcart.customer_id}</td></tr>`;
-                if (i == 0) {
-                    firstShopcart = shopcart;
-                }
+            table += '<th class="col-md-5">Shopcart ID</th>'
+            table += '</tr></thead><tbody class="scrollTbody">'
+
+            for(let i = 0; i < res['shopcarts'].length; i++) {
+                table +=  `<tr id="row_${i}"><td>${JSON.stringify(res['shopcarts'][i]['items'][0])}</td><td>${res['shopcarts'][i].customer_id}</td><td>${res['shopcarts'][i].id}</td></tr>`;
+            }
+            if(res['shopcarts'].length == 0){
+                table +=  `<tr><td>No shopcarts in database</td></tr>`;
             }
             table += '</tbody></table>';
-            $("#search_results").append(table);
+            $("#shopcarts_results").append(table);
 
-            // copy the first result to the form
-            if (firstShopcart != "") {
-                update_form_data(firstShopcart)
-            }
 
-            flash_message("Success")
+            flash_message("Successfully listed all shopcarts")
         });
 
         ajax.fail(function(res){
             flash_message(res.responseJSON.message)
         });
 
+    });
+
+    // ****************************************
+    // Clear the Form
+    // ****************************************
+
+    $("#clear-btn").click(function () {
+        $("#flash_message").empty();
+        clear_form_data()
     });
 
 })
