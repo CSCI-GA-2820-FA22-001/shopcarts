@@ -54,10 +54,16 @@ $(function () {
         });
 
         ajax.done(function(res){
+            clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message("Successfully added an empty shopcart")
         });
 
         ajax.fail(function(res){
+            clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message(res.responseJSON.message)
         });
     });
@@ -94,10 +100,16 @@ $(function () {
         });
 
         ajax.done(function(res){
+            clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message("Successfully added an Item")
         });
 
         ajax.fail(function(res){
+            clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message(res.responseJSON.message)
         });
     });
@@ -133,12 +145,18 @@ $(function () {
             let item = res;
             table += `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.quantity}</td><td>${item.price}</td><td>${item.shopcart_id}</td></tr>`;
             table += '</tbody></table>';
+
             $("#search_results").append(table);
+
+            update_form_data(res);
+            $("#shopcarts_results").empty();
             flash_message("Successfully retrieved the item")
         });
 
         ajax.fail(function(res){
             clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message(res.responseJSON.message)
         });
 
@@ -192,20 +210,26 @@ $(function () {
             let table = '<table class="table table-striped" cellpadding="10">'
             table += '<thead><tr>'
             table += '<th class="col-md-2">Item ID</th>'
-            table += '<th class="col-md-2">Item Name</th>'
             table += '<th class="col-md-2">Quantity</th>'
             table += '<th class="col-md-2">Price</th>'
             table += '<th class="col-md-2">Shopcart_ID</th>'
             table += '</tr></thead><tbody>'
 
             let item = res;
-            table += `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.quantity}</td><td>${item.price}</td><td>${item.shopcart_id}</td></tr>`;
+            table += `<tr><td>${item_id}</td><td>${data["quantity"]}</td><td>${data["price"]}</td><td>${shopcart_id}</td></tr>`;
             table += '</tbody></table>';
+
             $("#search_results").append(table);
+
+            clear_form_data()
+            $("#shopcarts_results").empty();
             flash_message(`Successfully updated the item`)
         });
 
         ajax.fail(function(res){
+            clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message(res.responseJSON.message)
         });
 
@@ -229,23 +253,32 @@ $(function () {
         })
 
         ajax.done(function(res){
-            //alert(res.toSource())
             $("#shopcarts_results").empty();
             let table = '<table class="table table-striped" cellpadding="10">'
             table += '<thead><tr>'
-            table += '<th class="col-md-5">Shopcart ID</th>'
+            table += '<th class="col-md-5">Result in form of CustomerID, Shopcart_ID, Items[]</th>'
             table += '</tr></thead><tbody class="scrollTbody">'
 
-            table +=  `<tr><td>${JSON.stringify(res['items'][0])}</td><td>${res.customer_id}</td><td>${res.id}</td></tr>`;
+            table +=  `<tr><td>Customer ID = ${res.customer_id}</td><td>Shopcart ID = ${res.id}</td></tr>`;
 
+            for(let i = 0; i < res['items'].length; i++) {
+                table +=  `<tr><td>One of it's Item </td><td>${JSON.stringify(res['items'][i])}</td></tr>`;
+            }
+            if(res['items'].length == 0){
+                table +=  `<tr><td>It has an EMPTY Item</td></tr>`;
+            }
             table += '</tbody></table>';
             $("#shopcarts_results").append(table);
 
+            clear_form_data()
+            $("#search_results").empty();
             flash_message("Successfully retrieved the shopcart")
         });
 
         ajax.fail(function(res){
             clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message(res.responseJSON.message)
         });
 
@@ -267,11 +300,18 @@ $(function () {
             $("#shopcarts_results").empty();
             let table = '<table class="table table-striped" cellpadding="10">'
             table += '<thead><tr>'
-            table += '<th class="col-md-5">Shopcart ID</th>'
+            table += '<th class="col-md-5">Result in form of CustomerID, Shopcart_ID, Items[]</th>'
             table += '</tr></thead><tbody class="scrollTbody">'
 
             for(let i = 0; i < res['shopcarts'].length; i++) {
-                table +=  `<tr id="row_${i}"><td>${JSON.stringify(res['shopcarts'][i]['items'][0])}</td><td>${res['shopcarts'][i].customer_id}</td><td>${res['shopcarts'][i].id}</td></tr>`;
+                // table += `<tr><td>Serial No.${i}</td></tr>`;
+                table +=  `<tr id="row_${i}"><td>Customer_ID = ${res['shopcarts'][i].customer_id}</td><td>Shopcart_ID = ${res['shopcarts'][i].id}</td></tr>`;
+                for(let j = 0; j < res['shopcarts'][i]['items'].length; j++) {
+                    table +=  `<tr><td>One of it's Item </td><td>${JSON.stringify(res['shopcarts'][i]['items'][j])}</td></tr>`;
+                }
+                if( res['shopcarts'][i]['items'].length == 0){
+                    table +=  `<tr><td>It has an EMPTY Item</td></tr>`;
+                }
             }
             if(res['shopcarts'].length == 0){
                 table +=  `<tr><td>No shopcarts in database</td></tr>`;
@@ -279,11 +319,15 @@ $(function () {
             table += '</tbody></table>';
             $("#shopcarts_results").append(table);
 
+            clear_form_data()
+            $("#search_results").empty();
             flash_message("Successfully listed all the shopcarts")
         });
 
         ajax.fail(function(res){
             clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message(res.responseJSON.message)
         });
 
@@ -308,11 +352,15 @@ $(function () {
 
         ajax.done(function(res){
             clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message("Successfully deleted an item")
         });
 
         ajax.fail(function(res){
             clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message("Successfully deleted an item")
         });
     });
@@ -333,10 +381,16 @@ $(function () {
         });
 
         ajax.done(function(res){
+            clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message("Successfully cleared the shopcart" )
         });
 
         ajax.fail(function(res){
+            clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message(res.responseJSON.message)
         });
     });
@@ -377,11 +431,18 @@ $(function () {
             $("#shopcarts_results").empty();
             let table = '<table class="table table-striped" cellpadding="10">'
             table += '<thead><tr>'
-            table += '<th class="col-md-5">Shopcart ID</th>'
+            table += '<th class="col-md-5">Result in form of CustomerID, Shopcart_ID, Items[]</th>'
             table += '</tr></thead><tbody class="scrollTbody">'
 
             for(let i = 0; i < res['shopcarts'].length; i++) {
-                table +=  `<tr id="row_${i}"><td>${JSON.stringify(res['shopcarts'][i]['items'][0])}</td><td>${res['shopcarts'][i].customer_id}</td><td>${res['shopcarts'][i].id}</td></tr>`;
+                // table += `<tr><td>Serial No.${i}</td></tr>`;
+                table +=  `<tr id="row_${i}"><td>Customer_ID = ${res['shopcarts'][i].customer_id}</td><td>Shopcart_ID = ${res['shopcarts'][i].id}</td></tr>`;
+                for(let j = 0; j < res['shopcarts'][i]['items'].length; j++) {
+                    table +=  `<tr><td>One of it's Item </td><td>${JSON.stringify(res['shopcarts'][i]['items'][j])}</td></tr>`;
+                }
+                if( res['shopcarts'][i]['items'].length == 0){
+                    table +=  `<tr><td>It has an EMPTY Item</td></tr>`;
+                }
             }
             if(res['shopcarts'].length == 0){
                 table +=  `<tr><td>No shopcarts in database</td></tr>`;
@@ -389,11 +450,15 @@ $(function () {
             table += '</tbody></table>';
             $("#shopcarts_results").append(table);
 
-
+            clear_form_data()
+            $("#search_results").empty();
             flash_message("Successfully listed all shopcarts")
         });
 
         ajax.fail(function(res){
+            clear_form_data()
+            $("#search_results").empty();
+            $("#shopcarts_results").empty();
             flash_message(res.responseJSON.message)
         });
 
@@ -406,6 +471,8 @@ $(function () {
     $("#clear-btn").click(function () {
         $("#flash_message").empty();
         clear_form_data()
+        $("#search_results").empty();
+        $("#shopcarts_results").empty();
     });
 
 })
