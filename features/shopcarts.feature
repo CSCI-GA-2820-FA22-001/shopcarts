@@ -17,74 +17,147 @@ Feature: The shopcart service back-end
 
     Scenario: Create a Shopcart
         When I visit the "home page"
-        And I set the "customer_id" to "5566"
-        And I set the "item_id" to "40"
-        And I set the "item_name" to "Banana"
-        And I set the "quantity" to "1"
-        And I set the "price" to "0.5"
-        And I set the "color" to "green"
-        And I press the "create-shopcart-btn" button
+        And I set the "Customer ID" to "5566"
+        And I press the "Create Shopcart" button
         Then I should see the message "Success"
-        When I copy the "shopcart_id" field
-        And I press the "clear-btn" button
-        Then the "shopcart_id" field should be empty
-        And the "item_id" field should be empty
-        And the "item_name" field should be empty
-        And the "quantity" field should be empty
-        And the "price" field should be empty
-        And the "color" field should be empty
-        When I paste the "ID" field
-
-        And I should see "4" in the "shopcart_id" field
+        When I copy the "Shopcart ID" field
+        And I press the "Clear Form" button
+        Then the "Shopcart ID" field should be empty
+        And the "Customer ID" field should be empty
+        When I paste the "Shopcart ID" field
+        And I press the "Retrieve Shopcart" button
+        Then I should see the message "Success"
+        And I should see "Customer ID = 5566" in the shopcart results
+        And I should see "It has an EMPTY Item" in the shopcart results
 
     Scenario: List all Shopcarts
         When I visit the "home page"
-        # not there yet
         And I press the "List All Shopcarts" button
         Then I should see the message "Success"
-        And I should see "1" in the results
-        And I should see "2" in the results
-        And I should see "3" in the results
+        And I should see "Customer ID = 10" in the shopcart results
+        And I should see "Item #1" in the shopcart results
+        And I should see "color: silver" in the shopcart results
+        And I should see "id: 5" in the shopcart results
+        And I should see "name: MacBook" in the shopcart results
+        And I should see "price: 1000" in the shopcart results
+        And I should see "quantity: 1" in the shopcart results
+        And I should see "Customer ID = 11" in the shopcart results
+        And I should see "Item #1" in the shopcart results
+        And I should see "color: black" in the shopcart results
+        And I should see "id: 6" in the shopcart results
+        And I should see "name: Backpack" in the shopcart results
+        And I should see "price: 50" in the shopcart results
+        And I should see "quantity: 3" in the shopcart results
+        And I should see "Customer ID = 12" in the shopcart results
+        And I should see "Item #1" in the shopcart results
+        And I should see "color: yellow" in the shopcart results
+        And I should see "id: 7" in the shopcart results
+        And I should see "name: Sneaker" in the shopcart results
+        And I should see "price: 80" in the shopcart results
+        And I should see "quantity: 1" in the shopcart results
 
-    Scenario: Query a Shopcart
+    Scenario: Search a Shopcart
         When I visit the "home page"
-        And I set the "customer_id" to "12"
-        And I press the "search" button
+        And I set the "Customer ID" to "5566"
+        And I press the "Create Shopcart" button
         Then I should see the message "Success"
-        And I should see "3" in the results
-
-    Scenario: Checkout a Shopcart
-        When I visit the "home page"
-        And I set the "shopcart_id" to "1"
-        # not there yet
-        And I press the "checkout" button
+        When I press the "Clear Form" button
+        Then the "Shopcart ID" field should be empty
+        And the "Customer ID" field should be empty
+        When I set the "Customer ID" to "5566"
+        And I press the "Search Shopcart" button
         Then I should see the message "Success"
-    # not done yet
-
-
+        And I should see "Customer ID = 5566" in the shopcart results
+        And I should see "It has an EMPTY Item" in the shopcart results
 
     Scenario: Retrieve a Shopcart
         When I visit the "home page"
-        And I set the "shopcart_id" to "1"
-        And I press the "retrieve" button
+        And I set the "Customer ID" to "10"
+        And I press the "Search Shopcart" button
         Then I should see the message "Success"
-        And I should see "10" in the "customer_id" field
-    # And I should see "[{'id':5, 'name':'MacBook', 'price':1000, 'quantity':1, 'color':'silver'}]" in "items"
-
-    Scenario: Update a Shopcart
-        When I visit the "home page"
-        And I set the "shopcart_id" to "2"
-        And I set the "customer_id" to "7788"
+        When I copy the "Shopcart ID" field
+        And I press the "Clear Form" button
+        Then the "Shopcart ID" field should be empty
+        And the "Customer ID" field should be empty
+        When I paste the "Shopcart ID" field
+        And I press the "Retrieve Shopcart" button
         Then I should see the message "Success"
-        When I set the "shopcart_id" to "2"
-        And I press the "retrieve" button
-        Then I should see "7788" in the "customer_id" field
+        And I should see "Customer ID = 10" in the shopcart results
+        And I should see "Item #1" in the shopcart results
+        And I should see "color: silver" in the shopcart results
+        And I should see "id: 5" in the shopcart results
+        And I should see "name: MacBook" in the shopcart results
+        And I should see "price: 1000" in the shopcart results
+        And I should see "quantity: 1" in the shopcart results
 
     Scenario: Delete a Shopcart
         When I visit the "home page"
-        And I set the "shopcart_id" to "1"
+        And I set the "Customer ID" to "5566"
+        And I press the "Create Shopcart" button
         Then I should see the message "Success"
-        And I should see "10" in the "customer_id" field
-        When I set the "shopcart_id" to "1"
-        And I press the "delete" button
-        Then I should see the message "Shopcart has been Deleted!"
+        When I copy the "Shopcart ID" field
+        And I press the "Clear Form" button
+        And I paste the "Shopcart ID" field
+        And I press the "Delete Shopcart" button
+        Then I should see the message "Successfully cleared the shopcart"
+        When I press the "List All Shopcarts" button
+        Then I should not see "Customer ID = 5566" in the shopcart results
+        And I should not see "It has an EMPTY Item" in the shopcart results
+
+    Scenario: Add an Item to a Shopcart
+        When I visit the "home page"
+        And I set the "Customer ID" to "10"
+        And I press the "Search Shopcart" button
+        Then I should see the message "Success"
+        When I copy the "Shopcart ID" field
+        And I press the "Clear Form" button
+        And I paste the "Shopcart ID" field
+        And I set the "Item ID" to "8"
+        And I set the "Item Name" to "Banana"
+        And I set the "Quantity" to "5"
+        And I set the "Price" to "2.99"
+        And I set the "Color" to "green"
+        And I press the "Add to Shopcart" button
+        Then I should see the message "Success"
+        When I set the "Customer ID" to "10"
+        And I press the "Search Shopcart" button
+        Then I should see the message "Success"
+        When I copy the "Shopcart ID" field
+        And I press the "Clear Form" button
+        And I paste the "Shopcart ID" field
+        And I press the "Retrieve Shopcart" button
+        Then I should see the message "Success"
+        And I should see "Customer ID = 10" in the shopcart results
+        And I should see "color: green" in the shopcart results
+        And I should see "id: 8" in the shopcart results
+        And I should see "name: Banana" in the shopcart results
+        And I should see "price: 2.99" in the shopcart results
+        And I should see "quantity: 5" in the shopcart results
+
+#Scenario: Delete an Item from a Shopcart
+#    When I visit the "home page"
+#    And I set the "shopcart_id" to "1"
+#    # not there yet
+#    And I press the "checkout" button
+#    Then I should see the message "Success"
+#    # not done yet
+
+#Scenario: Update a Shopcart
+#    When I visit the "home page"
+#    And I set the "shopcart_id" to "2"
+#    And I set the "customer_id" to "7788"
+#    Then I should see the message "Success"
+#    When I set the "shopcart_id" to "2"
+#    And I press the "retrieve" button
+#    Then I should see "7788" in the "customer_id" field
+
+#Scenario: Checkout a Shopcart
+#    When I visit the "home page"
+#    And I set the "shopcart_id" to "1"
+#    # not there yet
+#    And I press the "checkout" button
+#    Then I should see the message "Success"
+# not done yet
+
+
+

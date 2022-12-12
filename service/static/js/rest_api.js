@@ -29,7 +29,7 @@ $(function () {
         $("#item_name").val("");
         $("#quantity").val("");
         $("#price").val("");
-        $("#color").val(""); 
+        $("#color").val("");
     }
 
     // Updates the flash message area
@@ -249,7 +249,7 @@ $(function () {
     // Retrieve Shopcart
     // ****************************************
 
-    $("#retrieve-btn").click(function () {
+    $("#retrieve-shopcart-btn").click(function () {
 
         let shopcart_id = Number($("#shopcart_id").val());
 
@@ -268,11 +268,16 @@ $(function () {
             table += '<thead><tr>'
             table += '<th class="col-md-5">Result in form of CustomerID, Shopcart_ID, Items[]</th>'
             table += '</tr></thead><tbody class="scrollTbody">'
-
             table += `<tr><td>Customer ID = ${res.customer_id}</td><td>Shopcart ID = ${res.id}</td></tr>`;
-
             for (let i = 0; i < res['items'].length; i++) {
-                table += `<tr><td>One of it's Item </td><td>${JSON.stringify(res['items'][i])}</td></tr>`;
+                table += `<tr><td>Item #${i + 1}</td><td>
+                color: ${res['items'][i]["color"]} <br>
+                id: ${res['items'][i]["id"]}<br>
+                name: ${res['items'][i]["name"]}<br>
+                price: ${res['items'][i]["price"]}<br>
+                quantity: ${res['items'][i]["quantity"]}<br>
+                shopcart_id: ${res['items'][i]["shopcart_id"]}<br>
+                 </td></tr>`;
             }
             if (res['items'].length == 0) {
                 table += `<tr><td>It has an EMPTY Item</td></tr>`;
@@ -315,9 +320,16 @@ $(function () {
 
             for (let i = 0; i < res['shopcarts'].length; i++) {
                 // table += `<tr><td>Serial No.${i}</td></tr>`;
-                table += `<tr id="row_${i}"><td>Customer_ID = ${res['shopcarts'][i].customer_id}</td><td>Shopcart_ID = ${res['shopcarts'][i].id}</td></tr>`;
+                table += `<tr id="row_${i}"><td>Customer ID = ${res['shopcarts'][i].customer_id}</td><td>Shopcart ID = ${res['shopcarts'][i].id}</td></tr>`;
                 for (let j = 0; j < res['shopcarts'][i]['items'].length; j++) {
-                    table += `<tr><td>One of it's Item </td><td>${JSON.stringify(res['shopcarts'][i]['items'][j])}</td></tr>`;
+                    table += `<tr><td>Item #${j + 1}</td><td>
+                    color: ${res['shopcarts'][i]['items'][j]["color"]} <br>
+                    id: ${res['shopcarts'][i]['items'][j]["id"]}<br>
+                    name: ${res['shopcarts'][i]['items'][j]["name"]}<br>
+                    price: ${res['shopcarts'][i]['items'][j]["price"]}<br>
+                    quantity: ${res['shopcarts'][i]['items'][j]["quantity"]}<br>
+                    shopcart_id: ${res['shopcarts'][i]['items'][j]["shopcart_id"]}<br>
+                     </td></tr>`;
                 }
                 if (res['shopcarts'][i]['items'].length == 0) {
                     table += `<tr><td>It has an EMPTY Item</td></tr>`;
@@ -376,9 +388,9 @@ $(function () {
     });
 
     // ****************************************
-    // Clear Shopcart
+    // Delete Shopcart
     // ****************************************
-    $("#clear-shopcart-btn").click(function () {
+    $("#delete-shopcart-btn").click(function () {
 
         let shopcart_id = Number($("#shopcart_id").val());
 
@@ -409,7 +421,7 @@ $(function () {
     // ****************************************
     // Search for a Shopcart
     // ****************************************
-    $("#search-shopcarts-btn").click(function () {
+    $("#search-shopcart-btn").click(function () {
 
         let shopcart_id = $("#shopcart_id").val();
         let customer_id = $("#customer_id").val();
@@ -446,9 +458,16 @@ $(function () {
 
             for (let i = 0; i < res['shopcarts'].length; i++) {
                 // table += `<tr><td>Serial No.${i}</td></tr>`;
-                table += `<tr id="row_${i}"><td>Customer_ID = ${res['shopcarts'][i].customer_id}</td><td>Shopcart_ID = ${res['shopcarts'][i].id}</td></tr>`;
+                table += `<tr id="row_${i}"><td>Customer ID = ${res['shopcarts'][i].customer_id}</td><td>Shopcart ID = ${res['shopcarts'][i].id}</td></tr>`;
                 for (let j = 0; j < res['shopcarts'][i]['items'].length; j++) {
-                    table += `<tr><td>One of it's Item </td><td>${JSON.stringify(res['shopcarts'][i]['items'][j])}</td></tr>`;
+                    table += `<tr><td>Item #${j + 1}</td><td>
+                    color: ${res['shopcarts'][i]['items'][j]["color"]} <br>
+                    id: ${res['shopcarts'][i]['items'][j]["id"]}<br>
+                    name: ${res['shopcarts'][i]['items'][j]["name"]}<br>
+                    price: ${res['shopcarts'][i]['items'][j]["price"]}<br>
+                    quantity: ${res['shopcarts'][i]['items'][j]["quantity"]}<br>
+                    shopcart_id: ${res['shopcarts'][i]['items'][j]["shopcart_id"]}<br>
+                     </td></tr>`;
                 }
                 if (res['shopcarts'][i]['items'].length == 0) {
                     table += `<tr><td>It has an EMPTY Item</td></tr>`;
@@ -458,9 +477,8 @@ $(function () {
                 table += `<tr><td>No shopcarts in database</td></tr>`;
             }
             table += '</tbody></table>';
+            $("#shopcart_id").val(res['shopcarts'][0].id);
             $("#shopcarts_results").append(table);
-
-            clear_form_data()
             $("#search_results").empty();
             flash_message("Successfully listed all shopcarts")
         });
@@ -478,7 +496,7 @@ $(function () {
     // Clear the Form
     // ****************************************
 
-    $("#clear-btn").click(function () {
+    $("#clear-form-btn").click(function () {
         $("#flash_message").empty();
         clear_form_data()
         $("#search_results").empty();
