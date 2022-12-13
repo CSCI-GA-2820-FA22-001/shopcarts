@@ -5,10 +5,10 @@ Feature: The shopcart service back-end
 
     Background:
         Given the following shopcarts
-            | id | customer_id | items                                                                      |
-            | 1  | 10          | [{'id':5, 'name':'MacBook', 'price':1000, 'quantity':1, 'color':'silver'}] |
-            | 2  | 11          | [{'id':6, 'name':'Backpack', 'price':50, 'quantity':3, 'color':'black'}]   |
-            | 3  | 12          | [{'id':7, 'name':'Sneaker', 'price':80, 'quantity':1, 'color':'yellow'}]   |
+            | customer_id | items                                                                      |
+            | 10          | [{'id':5, 'name':'MacBook', 'price':1000, 'quantity':1, 'color':'silver'}] |
+            | 11          | [{'id':6, 'name':'Backpack', 'price':50, 'quantity':3, 'color':'black'}]   |
+            | 12          | [{'id':7, 'name':'Sneaker', 'price':80, 'quantity':1, 'color':'yellow'}]   |
 
     Scenario: The server is running
         When I visit the "home page"
@@ -186,42 +186,42 @@ Feature: The shopcart service back-end
         And I should not see "price: 1000" in the shopcart results
         And I should not see "quantity: 1" in the shopcart results
 
-    # # Not ready
-    # Scenario: Update a Shopcart
-    #     When I visit the "home page"
-    #     And I set the "Customer ID" to "10"
-    #     And I press the "Search Shopcart" button
-    #     Then I should see the message "Successfully listed all shopcarts"
-    #     And I should see "Customer ID = 10" in the shopcart results
-    #     When I copy the "Shopcart ID" field
-    #     And I press the "Clear Form" button
-    #     Then the "Shopcart ID" field should be empty
-    #     And the "Customer ID" field should be empty
-    #     When I paste the "Shopcart ID" field
-    #     And I set the "Customer ID" to "9527"
-    #     And I press the "Update Shopcart" button
-    #     Then I should see the message "Success"
-    #     When I press the "Clear Form" button
-    #     Then the "Shopcart ID" field should be empty
-    #     And the "Customer ID" field should be empty
-    #     When I paste the "Shopcart ID" field
-    #     And I press the "Retrieve Shopcart" button
-    #     Then I should see "Customer ID = 9527" in the shopcart results
+# # Not ready
+# Scenario: Update a Shopcart
+#     When I visit the "home page"
+#     And I set the "Customer ID" to "10"
+#     And I press the "Search Shopcart" button
+#     Then I should see the message "Successfully listed all shopcarts"
+#     And I should see "Customer ID = 10" in the shopcart results
+#     When I copy the "Shopcart ID" field
+#     And I press the "Clear Form" button
+#     Then the "Shopcart ID" field should be empty
+#     And the "Customer ID" field should be empty
+#     When I paste the "Shopcart ID" field
+#     And I set the "Customer ID" to "9527"
+#     And I press the "Update Shopcart" button
+#     Then I should see the message "Success"
+#     When I press the "Clear Form" button
+#     Then the "Shopcart ID" field should be empty
+#     And the "Customer ID" field should be empty
+#     When I paste the "Shopcart ID" field
+#     And I press the "Retrieve Shopcart" button
+#     Then I should see "Customer ID = 9527" in the shopcart results
 
-    # # Not ready
-    # Scenario: Checkout a Shopcart
-    #     When I visit the "home page"
-    #     And I set the "Customer ID" to "10"
-    #     And I press the "Search Shopcart" button
-    #     Then I should see the message "Successfully listed all shopcarts"
-    #     And I should see "id: 5" in the shopcart results
-    #     When I set the "Item ID" to "5"
-    #     And I press the "Checkout Shopcart" button
-    #     Then I should see the message "Success"
-    #     When I set the "Customer ID" to "10"
-    #     And I press the "Search Shopcart" button
-    #     Then I should see the message "Successfully listed all shopcarts"
-    #     And I should not see "id: 5" in the shopcart results
+# # Not ready
+# Scenario: Checkout a Shopcart
+#     When I visit the "home page"
+#     And I set the "Customer ID" to "10"
+#     And I press the "Search Shopcart" button
+#     Then I should see the message "Successfully listed all shopcarts"
+#     And I should see "id: 5" in the shopcart results
+#     When I set the "Item ID" to "5"
+#     And I press the "Checkout Shopcart" button
+#     Then I should see the message "Success"
+#     When I set the "Customer ID" to "10"
+#     And I press the "Search Shopcart" button
+#     Then I should see the message "Successfully listed all shopcarts"
+#     And I should not see "id: 5" in the shopcart results
 
 
 
