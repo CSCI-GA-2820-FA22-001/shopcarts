@@ -33,7 +33,7 @@ def step_impl(context):
     rest_endpoint = f"{context.BASE_URL}/shopcarts"
     context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
-    existing_shopcarts = context.resp.json()['shopcarts']
+    existing_shopcarts = context.resp.json()
     for shopcart in existing_shopcarts:
         context.resp = requests.delete(f"{rest_endpoint}/{shopcart['id']}")
         expect(context.resp.status_code).to_equal(204)
