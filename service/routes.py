@@ -19,14 +19,7 @@ from . import app, api
 @app.route("/")
 def index():
     """ Root URL response """
-    return (
-        jsonify(
-            name="Shopcart REST API Service available at /shopcarts",
-            status=status.HTTP_200_OK,
-            version="1.0.0",
-        ),
-        status.HTTP_200_OK,
-    )
+    return app.send_static_file("index.html")
 
 
 item_model = api.model('Item', {
@@ -414,7 +407,7 @@ class ItemResource(Resource):
 ######################################################################
 @app.route("/health", methods=["GET"])
 def check_health():
-    """ The health endpoint for Kubernete """
+    """ The health endpoint for Kubernetes """
     return jsonify(status="OK"), status.HTTP_200_OK
 
 ######################################################################
