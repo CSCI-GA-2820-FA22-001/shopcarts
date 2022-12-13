@@ -186,24 +186,44 @@ Feature: The shopcart service back-end
         And I should not see "price: 1000" in the shopcart results
         And I should not see "quantity: 1" in the shopcart results
 
+    # # Not ready
+    # Scenario: Update a Shopcart
+    #     When I visit the "home page"
+    #     And I set the "Customer ID" to "10"
+    #     And I press the "Search Shopcart" button
+    #     Then I should see the message "Successfully listed all shopcarts"
+    #     And I should see "Customer ID = 10" in the shopcart results
+    #     When I copy the "Shopcart ID" field
+    #     And I press the "Clear Form" button
+    #     Then the "Shopcart ID" field should be empty
+    #     And the "Customer ID" field should be empty
+    #     When I paste the "Shopcart ID" field
+    #     And I set the "Customer ID" to "9527"
+    #     And I press the "Update Shopcart" button
+    #     Then I should see the message "Success"
+    #     When I press the "Clear Form" button
+    #     Then the "Shopcart ID" field should be empty
+    #     And the "Customer ID" field should be empty
+    #     When I paste the "Shopcart ID" field
+    #     And I press the "Retrieve Shopcart" button
+    #     Then I should see "Customer ID = 9527" in the shopcart results
 
-# not done yet
-#Scenario: Update a Shopcart
-#    When I visit the "home page"
-#    And I set the "shopcart_id" to "2"
-#    And I set the "customer_id" to "7788"
-#    Then I should see the message "Success"
-#    When I set the "shopcart_id" to "2"
-#    And I press the "retrieve" button
-#    Then I should see "7788" in the "customer_id" field
+    # # Not ready
+    # Scenario: Checkout a Shopcart
+    #     When I visit the "home page"
+    #     And I set the "Customer ID" to "10"
+    #     And I press the "Search Shopcart" button
+    #     Then I should see the message "Successfully listed all shopcarts"
+    #     And I should see "id: 5" in the shopcart results
+    #     When I set the "Item ID" to "5"
+    #     And I press the "Checkout Shopcart" button
+    #     Then I should see the message "Success"
+    #     When I set the "Customer ID" to "10"
+    #     And I press the "Search Shopcart" button
+    #     Then I should see the message "Successfully listed all shopcarts"
+    #     And I should not see "id: 5" in the shopcart results
 
-#Scenario: Checkout a Shopcart
-#    When I visit the "home page"
-#    And I set the "shopcart_id" to "1"
-#    # not there yet
-#    And I press the "checkout" button
-#    Then I should see the message "Success"
-# not done yet
+
 
 
 
