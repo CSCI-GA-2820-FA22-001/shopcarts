@@ -364,10 +364,12 @@ class ItemResource(Resource):
         check_content_type("application/json")
 
         req = api.payload
-        if not "quantity" in req.keys() and not "price" in req.keys():
-            abort(status.HTTP_400_BAD_REQUEST, "Must have either quantity or price.")
+        if not "quantity" in req.keys() and not "price" in req.keys() and not "color" in req.keys():
+            abort(status.HTTP_400_BAD_REQUEST,
+                "Must have either quantity or price.")
         quantity = None
         price = None
+        color = None
         if "quantity" in req.keys():
             if not isinstance(req["quantity"], int) or req["quantity"] <= 0:
                 abort(status.HTTP_400_BAD_REQUEST, "Invalid quantity.")
@@ -379,11 +381,17 @@ class ItemResource(Resource):
                 abort(status.HTTP_400_BAD_REQUEST, "Invalid price.")
             else:
                 price = req["price"]
+        if "color" in req.keys():
+            if not isinstance(req["color"], str) or req["color"] == "":
+                abort(status.HTTP_400_BAD_REQUEST, "Invalid color.")
+            else:
+                color = req["color"]
 
         # Make sure the shopcart exists
         shopcart = Shopcart.find(shopcart_id)
         if not shopcart:
-            abort(status.HTTP_404_NOT_FOUND, f"Shopcart with id {shopcart_id} was not found.")
+            abort(status.HTTP_404_NOT_FOUND,
+                f"Shopcart with id {shopcart_id} was not found.")
         item_index = -1
         # Make sure the item exists
         for i, item in enumerate(shopcart.items):
@@ -392,10 +400,16 @@ class ItemResource(Resource):
                 # Now proceed to update
                 if quantity:
                     item.quantity = quantity
-                    app.logger.info(f"item {item_id}'s quantity is changed to {quantity}")
+                    app.logger.info(
+                        f"item {item_id}'s quantity is changed to {quantity}")
                 if price is not None and price >= 0:
                     item.price = price
-                    app.logger.info(f"item {item_id}'s price is changed to {price}")
+                    app.logger.info(
+                        f"item {item_id}'s price is changed to {price}")
+                if color:
+                    item.color = color
+                    app.logger.info(
+                        f"item {item_id}'s color is changed to {color}")
                 shopcart.update()
                 return shopcart.serialize(), status.HTTP_200_OK
 

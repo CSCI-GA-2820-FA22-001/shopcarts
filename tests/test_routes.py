@@ -328,7 +328,7 @@ class TestShopcartServer(TestCase):
         # then this test will fail
         non_existing_item_id = 1
         for item in items:
-            non_existing_item_id += item.id
+            non_existing_item_id += item.id + randint(50, 100)
         resp = self.client.get(
             f"{BASE_URL}/{shopcart_id}/items/{non_existing_item_id}"
         )
@@ -389,6 +389,7 @@ class TestShopcartServer(TestCase):
         # try to update with request json containing neither price nor quantity keys
         req.pop("price")
         req.pop("quantity")
+        req.pop("color")
         resp = self.client.put(f"{BASE_URL}/{shopcart.id}/items/{item.id}",
          json=req, content_type="application/json"
         )
