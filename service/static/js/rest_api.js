@@ -484,7 +484,7 @@ $(function () {
             table += '</tbody></table>';
             $("#shopcarts_results").append(table);
 
-            clear_form_data()
+            $("#shopcart_id").val(res[0].id);
             $("#search_results").empty();
             flash_message("Successfully listed all the shopcarts")
         });
