@@ -56,7 +56,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "POST",
-            url: `/shopcarts`,
+            url: `/api/shopcarts`,
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -103,7 +103,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "POST",
-            url: `/shopcarts/${shopcart_id}/items`,
+            url: `/api/shopcarts/${shopcart_id}/items`,
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -134,7 +134,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/shopcarts/${shopcart_id}/items/${item_id}`,
+            url: `/api/shopcarts/${shopcart_id}/items/${item_id}`,
             contentType: "application/json",
             data: ''
         });
@@ -216,11 +216,11 @@ $(function () {
         $("#flash_message").empty();
 
         let ajax = $.ajax({
-            type: "PUT",
-            url: `/shopcarts/${shopcart_id}/items/${item_id}`,
-            contentType: "application/json",
-            data: JSON.stringify(data)
-        })
+                type: "PUT",
+                url: `/api/shopcarts/${shopcart_id}/items/${item_id}`,
+                contentType: "application/json",
+                data: JSON.stringify(data)
+            })
 
         ajax.done(function (res) {
             $("#search_results").empty();
@@ -262,7 +262,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/shopcarts/${shopcart_id}`,
+            url: `/api/shopcarts/${shopcart_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -312,7 +312,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/shopcarts`,
+            url: `/api/shopcarts`,
             // contentType: "application/json",
             data: ''
         })
@@ -323,25 +323,25 @@ $(function () {
             table += '<th class="col-md-5">Result in form of CustomerID, Shopcart_ID, Items[]</th>'
             table += '</tr></thead><tbody class="scrollTbody">'
 
-            for (let i = 0; i < res['shopcarts'].length; i++) {
+            for(let i = 0; i < res.length; i++) {
                 // table += `<tr><td>Serial No.${i}</td></tr>`;
-                table += `<tr id="row_${i}"><td>Customer ID = ${res['shopcarts'][i].customer_id}</td><td>Shopcart ID = ${res['shopcarts'][i].id}</td></tr>`;
-                for (let j = 0; j < res['shopcarts'][i]['items'].length; j++) {
+                table += `<tr id="row_${i}"><td>Customer ID = ${res[i].customer_id}</td><td>Shopcart ID = ${res[i].id}</td></tr>`;
+                for (let j = 0; j < res[i]['items'].length; j++) {
                     table += `<tr><td>Item #${j + 1}</td><td>
-                    color: ${res['shopcarts'][i]['items'][j]["color"]} <br>
-                    id: ${res['shopcarts'][i]['items'][j]["id"]}<br>
-                    name: ${res['shopcarts'][i]['items'][j]["name"]}<br>
-                    price: ${res['shopcarts'][i]['items'][j]["price"]}<br>
-                    quantity: ${res['shopcarts'][i]['items'][j]["quantity"]}<br>
-                    shopcart_id: ${res['shopcarts'][i]['items'][j]["shopcart_id"]}<br>
+                    color: ${res[i]['items'][j]["color"]} <br>
+                    id: ${res[i]['items'][j]["id"]}<br>
+                    name: ${res[i]['items'][j]["name"]}<br>
+                    price: ${res[i]['items'][j]["price"]}<br>
+                    quantity: ${res[i]['items'][j]["quantity"]}<br>
+                    shopcart_id: ${res[i]['items'][j]["shopcart_id"]}<br>
                      </td></tr>`;
                 }
-                if (res['shopcarts'][i]['items'].length == 0) {
-                    table += `<tr><td>It has an EMPTY Item</td></tr>`;
+                if( res[i]['items'].length == 0){
+                    table +=  `<tr><td>It has an EMPTY Item</td></tr>`;
                 }
             }
-            if (res['shopcarts'].length == 0) {
-                table += `<tr><td>No shopcarts in database</td></tr>`;
+            if(res.length == 0){
+                table +=  `<tr><td>No shopcarts in database</td></tr>`;
             }
             table += '</tbody></table>';
             $("#shopcarts_results").append(table);
@@ -372,7 +372,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/shopcarts/${shopcart_id}/items/${item_id}`,
+            url: `/api/shopcarts/${shopcart_id}/items/${item_id}`,
             contentType: "application/json",
             data: ''
         });
@@ -403,7 +403,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/shopcarts/${shopcart_id}`,
+            url: `/api/shopcarts/${shopcart_id}`,
             contentType: "application/json",
         });
 
@@ -434,7 +434,7 @@ $(function () {
         let queryString = ""
 
         if (shopcart_id) {
-            queryString += 'id=' + shopcart_id
+            queryString += 'shopcart_id=' + shopcart_id
         }
         if (customer_id) {
             if (queryString.length > 0) {
@@ -448,7 +448,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/shopcarts?${queryString}`,
+            url: `/api/shopcarts?${queryString}`,
             //contentType: "application/json",
             data: ''
         })
@@ -461,31 +461,32 @@ $(function () {
             table += '<th class="col-md-5">Result in form of CustomerID, Shopcart_ID, Items[]</th>'
             table += '</tr></thead><tbody class="scrollTbody">'
 
-            for (let i = 0; i < res['shopcarts'].length; i++) {
+            for(let i = 0; i < res.length; i++) {
                 // table += `<tr><td>Serial No.${i}</td></tr>`;
-                table += `<tr id="row_${i}"><td>Customer ID = ${res['shopcarts'][i].customer_id}</td><td>Shopcart ID = ${res['shopcarts'][i].id}</td></tr>`;
-                for (let j = 0; j < res['shopcarts'][i]['items'].length; j++) {
+                table += `<tr id="row_${i}"><td>Customer ID = ${res[i].customer_id}</td><td>Shopcart ID = ${res[i].id}</td></tr>`;
+                for (let j = 0; j < res[i]['items'].length; j++) {
                     table += `<tr><td>Item #${j + 1}</td><td>
-                    color: ${res['shopcarts'][i]['items'][j]["color"]} <br>
-                    id: ${res['shopcarts'][i]['items'][j]["id"]}<br>
-                    name: ${res['shopcarts'][i]['items'][j]["name"]}<br>
-                    price: ${res['shopcarts'][i]['items'][j]["price"]}<br>
-                    quantity: ${res['shopcarts'][i]['items'][j]["quantity"]}<br>
-                    shopcart_id: ${res['shopcarts'][i]['items'][j]["shopcart_id"]}<br>
+                    color: ${res[i]['items'][j]["color"]} <br>
+                    id: ${res[i]['items'][j]["id"]}<br>
+                    name: ${res[i]['items'][j]["name"]}<br>
+                    price: ${res[i]['items'][j]["price"]}<br>
+                    quantity: ${res[i]['items'][j]["quantity"]}<br>
+                    shopcart_id: ${res[i]['items'][j]["shopcart_id"]}<br>
                      </td></tr>`;
                 }
-                if (res['shopcarts'][i]['items'].length == 0) {
-                    table += `<tr><td>It has an EMPTY Item</td></tr>`;
+                if( res[i]['items'].length == 0){
+                    table +=  `<tr><td>It has an EMPTY Item</td></tr>`;
                 }
             }
-            if (res['shopcarts'].length == 0) {
-                table += `<tr><td>No shopcarts in database</td></tr>`;
+            if(res.length == 0){
+                table +=  `<tr><td>No shopcarts in database</td></tr>`;
             }
             table += '</tbody></table>';
-            $("#shopcart_id").val(res['shopcarts'][0].id);
             $("#shopcarts_results").append(table);
+
+            $("#shopcart_id").val(res[0].id);
             $("#search_results").empty();
-            flash_message("Successfully listed all shopcarts")
+            flash_message("Successfully listed all the shopcarts")
         });
 
         ajax.fail(function (res) {
