@@ -30,7 +30,7 @@ from compare import expect
 def step_impl(context):
     """ Delete all Shopcarts and load new ones """
     # List all of the shopcarts and delete them one by one
-    rest_endpoint = f"{context.BASE_URL}/shopcarts"
+    rest_endpoint = f"{context.BASE_URL}/api/shopcarts"
     context.resp = requests.get(rest_endpoint)
     expect(context.resp.status_code).to_equal(200)
     existing_shopcarts = context.resp.json()
