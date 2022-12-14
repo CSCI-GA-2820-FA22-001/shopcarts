@@ -47,8 +47,8 @@ at `/health` too.
 - Update an item in a Shopcart `PUT /shopcarts/<shopcart_id>/items/<item_id>`
 
 The service also provides other Actions:
-- Reset a Shopcart: `/shopcarts/<shopcart_id>/reset`
-- Checkout a Shopcart: `/shopcarts/<shopcart_id>/checkout`
+- Reset a Shopcart: `PUT /shopcarts/<shopcart_id>/reset`
+- Checkout a Shopcart: `POST /shopcarts/<shopcart_id>/checkout`
 
 
 ## How To Test
