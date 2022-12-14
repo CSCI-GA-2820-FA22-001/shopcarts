@@ -1,32 +1,67 @@
-# NYU DevOps Project Template
+# NYU DevOps Project - Shopcarts
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 [![Build Status](https://github.com/CSCI-GA-2820-FA22-001/shopcarts/actions/workflows/tdd.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA22-001/shopcarts/actions)
+[![Build Status](https://github.com/CSCI-GA-2820-FA22-001/shopcarts/actions/workflows/bdd.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA22-001/shopcarts/actions)
 
-This is a skeleton you can use to start your projects
+This is a class project for *DevOps and Agile Methodologies (CSCI-GA.2820)* at
+New York University, taught by Professor John Rofrano.
 
 ## Overview
 
-This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
+This project is one of the 8 RESTful microservices that are part of an eCommerce
+application. We adopt DevOps, Agile and Test Driven Development methodologies during this class.
 
-## Automatic Setup
+The `shopcarts` resource allow customers to make a collection of products that they want to purchase. It contains a reference to a product id, product name, and the quantity the customer wants to buy. It also contains the price of the product at the time it was placed in the cart.
 
-The best way to use this repo is to start your own repo using it as a git template. To do this just press the green **Use this template** button in GitHub and this will become the source for your repository.
+## Team Members
 
-## Manual Setup
+- Hu, Weiqi
+- Huang, Pin-Tsung
+- Xia, Robin
+- Bharti, Sweta
+- Lu, Yuheng
 
-You can also clone this repository and then copy and paste the starter code into your project repo folder on your local computer. Be careful not to copy over your own `README.md` file so be selective in what you copy.
+## Usage
+This service has a single page UI available at `/`, and there are also RESTful
+APIs for integration of the application. The service provides a health endpoint
+at `/health` too.
 
-There are 4 hidden files that you will need to copy manually if you use the Mac Finder or Windows Explorer to copy files from this folder into your repo folder.
+### `GET`
+- List all Shopcarts: `GET /shopcarts`
+- Read a Shopcart: `GET /shopcarts/<shopcart_id>`
+- List all items in a Shopcart `GET /shopcarts/<shopcart_id>/items`
+- Read an item in a Shopcart `GET /shopcarts/<shopcart_id>/items/<item_id>`
 
-These should be copied using a bash shell as follows:
+### `POST`
+- Create a Shopcart: `POST /shopcarts`.
+- Add an item to a Shopcart `POST /shopcarts/<shopcart_id>/items`
 
-```bash
-    cp .gitignore  ../<your_repo_folder>/
-    cp .flaskenv ../<your_repo_folder>/
-    cp .gitattributes ../<your_repo_folder>/
+### `DELETE`
+- Delete a Shopcart: `DELETE /shopcarts/<shopcart_id>`
+- Delete an item in a Shopcart `DELETE /shopcarts/<shopcart_id>/items/<item_id>`
+
+### `PUT`
+- Update a Shopcart: `PUT /shopcarts/<shopcart_id>`
+- Update an item in a Shopcart `PUT /shopcarts/<shopcart_id>/items/<item_id>`
+
+The service also provides other Actions:
+- Reset a Shopcart: `/shopcarts/<shopcart_id>/reset`
+- Checkout a Shopcart: `/shopcarts/<shopcart_id>/checkout`
+
+
+## How To Test
+We use `nosetests` and `behave`. Just run
 ```
+nosetests
+```
+and
+```
+behave
+```
+and they will print the test results and coverage.
+
 
 ## Contents
 

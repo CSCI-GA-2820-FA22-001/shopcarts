@@ -417,7 +417,7 @@ class ItemResource(Resource):
             abort(status.HTTP_404_NOT_FOUND, f"item with id {item_id} was not found.")
 
 ######################################################################
-# Health Endpoint for Kubernete
+# Health Endpoint for Kubernetes
 ######################################################################
 @app.route("/health", methods=["GET"])
 def check_health():
