@@ -4,6 +4,7 @@
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 [![Build Status](https://github.com/CSCI-GA-2820-FA22-001/shopcarts/actions/workflows/tdd.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA22-001/shopcarts/actions)
 [![Build Status](https://github.com/CSCI-GA-2820-FA22-001/shopcarts/actions/workflows/bdd.yml/badge.svg)](https://github.com/CSCI-GA-2820-FA22-001/shopcarts/actions)
+[![codecov](https://codecov.io/gh/CSCI-GA-2820-FA22-001/shopcarts/branch/master/graph/badge.svg?token=Y9PG0LUC7V)](https://codecov.io/gh/CSCI-GA-2820-FA22-001/shopcarts)
 
 This is a class project for *DevOps and Agile Methodologies (CSCI-GA.2820)* at
 New York University, taught by Professor John Rofrano.
